@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .product-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Image section styles */
+    .product-image-section {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9ff, #f0f3ff);
+        border-radius: 20px;
+    }
+
+    .product-detail-img {
+        max-width: 100%;
+        max-height: 300px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-image-placeholder {
+        font-size: 5rem;
+        padding: 2rem;
+        text-align: center;
+        background: #f7fafc;
+        border-radius: 15px;
+    }
+
+    .product-header {
+        text-align: center;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .product-name {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-meta {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+        color: #718096;
+    }
+
+    .product-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin: 2rem 0;
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .info-icon {
+        font-size: 1.25rem;
+        min-width: 30px;
+    }
+
+    .price-tag {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+        background: white;
+        display: inline-block;
+        padding: 0.25rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .description-section {
+        margin: 2rem 0;
+    }
+
+    .description-section h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #2d3748;
+        border-left: 4px solid #667eea;
+        padding-left: 1rem;
+    }
+
+    .description-text {
+        line-height: 1.8;
+        color: #4a5568;
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+
+    .btn-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: #718096;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+        background: #4a5568;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 640px) {
+        .product-container {
+            padding: 1rem;
+        }
+        .product-name {
+            font-size: 1.5rem;
+        }
+        .product-info-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .price-tag {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="product-container">
+    <!-- Product Image Section -->
+    <div class="product-image-section">
+        {% if product.image and product.image.url %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail-img">
+        {% else %}
+            <div class="no-image-placeholder">
+                {% if product.category == 'skincare' %}🧴
+                {% elif product.category == 'haircare' %}💇
+                {% elif product.category == 'food' %}🍎
+                {% elif product.category == 'supplements' %}💊
+                {% elif product.category == 'baby' %}👶
+                {% elif product.category == 'cosmetics' %}💄
+                {% elif product.category == 'medicines' %}💉
+                {% else %}📦
+                {% endif %}
+                <p style="font-size: 0.8rem; margin-top: 0.5rem;">No Image Available</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Product Header -->
+    <div class="product-header">
+        <h1 class="product-name">{{ product.name }}</h1>
+        <div class="product-meta">
+            <span>{{ product.get_category_display }}</span>
+            <span>•</span>
+            <span>Added on {{ product.created_at|date:"F d, Y" }}</span>
+        </div>
+    </div>
+
+    <!-- Product Info Grid -->
+    <div class="product-info-grid">
+        <div class="info-item">
+            <span class="info-icon">🏷️</span>
+            <div><strong>Brand</strong><br>{{ product.brand }}</div>
+        </div>
+        <div class="info-item">
+            <span class="info-icon">📂</span>
+            <div><strong>Category</strong><br>{{ product.get_category_display }}</div>
+        </div>
+        <div class="info-item">
+            <span class="info-icon">💰</span>
+            <div><strong>Price</strong><br><span class="price-tag">${{ product.price }}</span></div>
+        </div>
+        <div class="info-item">
+            <span class="info-icon">📅</span>
+            <div><strong>Added on</strong><br>{{ product.created_at|date:"F d, Y" }}</div>
+        </div>
+    </div>
+
+    <!-- Description Section -->
+    <div class="description-section">
+        <h3>📝 Product Description</h3>
+        <div class="description-text">
+            {{ product.description|default:"No description available."|linebreaks }}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Optional: console log for debugging
+    console.log("Product detail page loaded: {{ product.name }}");
+</script>
+{% endblock %}

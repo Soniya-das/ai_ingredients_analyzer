@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .analyzer-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 30px;
+        padding: 3rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .analyzer-title {
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .analyzer-subtitle {
+        text-align: center;
+        color: #718096;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .form-group input, 
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .form-group input:focus, 
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-analyze {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-analyze:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .example-text {
+        background: #f7fafc;
+        padding: 1rem;
+        border-radius: 15px;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: #718096;
+    }
+
+    .category-hint {
+        font-size: 0.75rem;
+        color: #a0aec0;
+        margin-top: 0.25rem;
+    }
+
+    /* Two column layout for category row */
+    .category-row {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .category-row .form-group {
+        flex: 2;
+    }
+
+    .category-row .form-group:last-child {
+        flex: 1;
+    }
+
+    @media (max-width: 640px) {
+        .analyzer-container {
+            padding: 1.5rem;
+        }
+        .analyzer-title {
+            font-size: 1.5rem;
+        }
+        .category-row {
+            flex-direction: column;
+            gap: 0;
+        }
+    }
+
+    /* Category badge preview */
+    .category-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .category-badge-skincare { background: #e6f7ff; color: #1890ff; }
+    .category-badge-haircare { background: #fff0f5; color: #eb2f96; }
+    .category-badge-food { background: #f6ffed; color: #52c41a; }
+    .category-badge-supplements { background: #fff7e6; color: #fa8c16; }
+    .category-badge-baby { background: #f0f5ff; color: #597ef7; }
+    .category-badge-cosmetics { background: #f9f0ff; color: #722ed1; }
+    .category-badge-medicines { background: #fff1f0; color: #ff4d4f; }
+</style>
+
+<div class="analyzer-container">
+    <h2 class="analyzer-title">🧠 AI Ingredient Analyzer</h2>
+    <p class="analyzer-subtitle">Paste product ingredients to get instant safety analysis</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>📦 Product Name</label>
+            <input type="text" name="product_name" placeholder="e.g., Vitamin C Serum, Moisturizing Cream" required>
+        </div>
+        
+        <div class="category-row">
+            <div class="form-group">
+                <label>📂 Category</label>
+                <select name="category" required>
+                    <option value="skincare">🧴 Skincare</option>
+                    <option value="haircare">💇 Haircare</option>
+                    <option value="food">🍎 Food</option>
+                    <option value="supplements">💊 Supplements</option>
+                    <option value="baby">👶 Baby Products</option>
+                    <option value="cosmetics">💄 Cosmetics</option>
+                    <option value="medicines">💉 Medicines</option>
+                </select>
+                <div class="category-hint">Select product category for accurate analysis</div>
+            </div>
+            
+            <div class="form-group">
+                <label>✨ Preview</label>
+                <div style="background: #f7fafc; padding: 0.75rem; border-radius: 12px; text-align: center; font-size: 0.85rem; color: #4a5568;">
+                    <span id="categoryPreview">🧴 Skincare</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>📋 Ingredients List</label>
+            <textarea name="ingredients" placeholder="Enter ingredients separated by commas or new lines...
+Example: Water, Glycerin, Hyaluronic Acid, Niacinamide" required></textarea>
+        </div>
+        
+        <button type="submit" class="btn-analyze">🔍 Analyze with AI</button>
+    </form>
+    
+    <div class="example-text">
+        <strong>💡 Example:</strong><br>
+        Water, Glycerin, Hyaluronic Acid, Vitamin C, Niacinamide, Shea Butter, Jojoba Oil<br><br>
+        <strong>✨ Tip:</strong> Selecting the correct category helps AI provide more accurate analysis!
+    </div>
+    
+    <div style="margin-top: 1.5rem; padding: 1rem; background: linear-gradient(135deg, #f8f9ff, #f0f3ff); border-radius: 15px;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+            <span class="category-badge category-badge-skincare">🧴 Skincare</span>
+            <span class="category-badge category-badge-haircare">💇 Haircare</span>
+            <span class="category-badge category-badge-food">🍎 Food</span>
+            <span class="category-badge category-badge-supplements">💊 Supplements</span>
+            <span class="category-badge category-badge-baby">👶 Baby</span>
+            <span class="category-badge category-badge-cosmetics">💄 Cosmetics</span>
+            <span class="category-badge category-badge-medicines">💉 Medicines</span>
+        </div>
+        <p style="text-align: center; font-size: 0.7rem; color: #a0aec0; margin-top: 0.75rem;">
+            AI analyzes ingredients based on product category
+        </p>
+    </div>
+</div>
+
+<script>
+    // Live preview of selected category
+    const categorySelect = document.querySelector('select[name="category"]');
+    const categoryPreview = document.getElementById('categoryPreview');
+    
+    const categoryIcons = {
+        'skincare': '🧴 Skincare',
+        'haircare': '💇 Haircare',
+        'food': '🍎 Food',
+        'supplements': '💊 Supplements',
+        'baby': '👶 Baby Products',
+        'cosmetics': '💄 Cosmetics',
+        'medicines': '💉 Medicines'
+    };
+    
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            const selected = this.value;
+            categoryPreview.textContent = categoryIcons[selected] || '📂 Selected';
+            categoryPreview.style.fontWeight = '600';
+        });
+    }
+</script>
+{% endblock %}

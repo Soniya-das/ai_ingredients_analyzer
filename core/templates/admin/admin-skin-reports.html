@@ -1,0 +1,702 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Admin Skin Reports Page Styles */
+    .skin-reports-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 24px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    /* Statistics Cards */
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Search Box - Professional Styling */
+    .search-section {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+    }
+    
+    .search-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-title-icon {
+        font-size: 1.2rem;
+    }
+    
+    .search-input-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+        min-width: 250px;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        color: #aaa;
+    }
+    
+    .search-input-field {
+        width: 100%;
+        padding: 14px 16px 14px 45px;
+        border: 2px solid #e9ecef;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        background: #f8f9fa;
+    }
+    
+    .search-input-field:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .search-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
+    
+    .search-clear {
+        background: #e9ecef;
+        color: #495057;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    
+    .search-clear:hover {
+        background: #dee2e6;
+        transform: translateY(-1px);
+    }
+    
+    .search-stats {
+        background: #f8f9fa;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    /* Bulk Actions Bar */
+    .bulk-actions-bar {
+        background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #667eea30;
+    }
+    
+    .bulk-actions-bar.show {
+        display: flex;
+    }
+    
+    .selected-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .selected-count {
+        font-weight: 800;
+        color: #667eea;
+        font-size: 1.2rem;
+    }
+    
+    .btn-bulk-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    
+    .btn-bulk-delete:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    }
+    
+    /* Reports Table */
+    .reports-table {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .reports-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .reports-table th {
+        background: #f8f9fa;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .reports-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .reports-table tr:hover {
+        background: #f8f9ff;
+    }
+    
+    .reports-table tr.highlight-row {
+        background: #e8f0fe;
+        border-left: 3px solid #667eea;
+    }
+    
+    .select-all-checkbox, .row-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+    
+    .verdict-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .verdict-excellent { background: #e8f5e9; color: #2e7d32; }
+    .verdict-good { background: #e3f2fd; color: #1565c0; }
+    .verdict-moderate { background: #fff3e0; color: #e65100; }
+    .verdict-avoid { background: #ffebee; color: #c62828; }
+    
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-sm {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .btn-view { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-restore { background: #28a745; color: white; }
+    .btn-delete { background: #dc3545; color: white; }
+    
+    .btn-sm:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+    
+    .user-deleted-badge {
+        display: inline-block;
+        background: #ffc107;
+        color: #856404;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
+    }
+    
+    .score-bar {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 6px;
+        width: 100px;
+        overflow: hidden;
+        margin-top: 0.3rem;
+    }
+    
+    .score-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    .score-fill.excellent { background: #28a745; }
+    .score-fill.good { background: #17a2b8; }
+    .score-fill.moderate { background: #ffc107; }
+    .score-fill.avoid { background: #dc3545; }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+    }
+    
+    .warning-text {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 15px;
+        padding: 10px;
+        background: #f8d7da;
+        border-radius: 8px;
+    }
+    
+    .modal-buttons {
+        margin-top: 25px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .modal-confirm { background: #dc3545; color: white; padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; }
+    .modal-cancel { background: #718096; color: white; padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; }
+    
+    .toast-message {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        z-index: 1100;
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .toast-success { background: #28a745; }
+    .toast-error { background: #dc3545; }
+    .toast-info { background: #17a2b8; }
+    
+    @media (max-width: 768px) {
+        .skin-reports-container { padding: 1rem; }
+        .reports-table { overflow-x: auto; }
+        .reports-table table { min-width: 600px; }
+        .stats-cards { grid-template-columns: repeat(2, 1fr); }
+        .search-input-group { flex-direction: column; }
+        .search-input-wrapper { width: 100%; }
+        .bulk-actions-bar { flex-direction: column; gap: 10px; }
+    }
+</style>
+
+<div class="skin-reports-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>✨ Skin Analysis Reports</h1>
+        <p>Complete overview of all user skincare product analyses with AI-powered recommendations</p>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-cards">
+        <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-number">{{ total_reports }}</div><div class="stat-label">Total Reports</div></div>
+        <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-number">{{ avg_score }}%</div><div class="stat-label">Average Score</div></div>
+        <div class="stat-card"><div class="stat-icon">🌟</div><div class="stat-number">{{ excellent_count }}</div><div class="stat-label">Excellent</div></div>
+        <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-number">{{ good_count }}</div><div class="stat-label">Good</div></div>
+        <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-number">{{ moderate_count }}</div><div class="stat-label">Moderate</div></div>
+        <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-number">{{ avoid_count }}</div><div class="stat-label">Avoid</div></div>
+    </div>
+    
+    <!-- Professional Search Section -->
+    <div class="search-section">
+        <div class="search-title">
+            <span class="search-title-icon">🔍</span>
+            <span>Search Reports</span>
+        </div>
+        <div class="search-input-group">
+            <div class="search-input-wrapper">
+                <span class="search-icon">👤</span>
+                <input type="text" id="searchInput" class="search-input-field" placeholder="Enter username to search...">
+            </div>
+            <button class="search-btn" onclick="performSearch()">
+                🔍 Search
+            </button>
+            <button class="search-clear" onclick="clearSearch()">
+                🗑️ Clear
+            </button>
+            <span class="search-stats" id="searchStats">Showing all reports</span>
+        </div>
+    </div>
+    
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions-bar" id="bulkActionsBar">
+        <div class="selected-info">✅ <span class="selected-count" id="selectedCount">0</span> report(s) selected</div>
+        <button class="btn-bulk-delete" onclick="showBulkDeleteModal()">🗑️ Delete Selected</button>
+    </div>
+    
+    <!-- Reports Table -->
+    <div class="reports-table">
+        <table id="reportsTable">
+            <thead>
+                <tr>
+                    <th style="width:40px;"><input type="checkbox" id="selectAllCheckbox" class="select-all-checkbox" onclick="toggleSelectAll()"></th>
+                    <th>ID</th><th>User</th><th>Product Name</th><th>Skin Type</th><th>Score</th><th>Verdict</th><th>Date</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="reportsTableBody">
+                {% for item in reports %}
+                <tr class="report-row" data-username="{{ item.username_display|lower }}" data-product="{{ item.report.product_name|lower }}" data-verdict="{{ item.report.overall_verdict|lower }}" data-id="{{ forloop.counter }}">
+                    <td><input type="checkbox" class="row-checkbox" data-report-id="{{ item.report.id }}" data-product-name="{{ item.report.product_name|escapejs }}" onclick="updateBulkActions()"></td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.username_display }}{% if item.is_deleted_by_user %}<span class="user-deleted-badge">🗑️ Deleted</span>{% endif %}</td>
+                    <td><strong>{{ item.report.product_name }}</strong><div class="score-bar"><div class="score-fill {{ item.report.overall_verdict }}" style="width:{{ item.report.overall_score }}%"></div></div></td>
+                    <td>{{ item.report.user_skin_type|default:"Not specified"|capfirst }}</td>
+                    <td><strong>{{ item.report.overall_score }}/100</strong></td>
+                    <td><span class="verdict-badge verdict-{{ item.report.overall_verdict }}">{% if item.report.overall_verdict == 'excellent' %}🌟 Excellent{% elif item.report.overall_verdict == 'good' %}✅ Good{% elif item.report.overall_verdict == 'moderate' %}⚠️ Moderate{% else %}❌ Avoid{% endif %}</span></td>
+                    <td>{{ item.report.analyzed_at|date:"Y-m-d H:i" }}</td>
+                    <td><div class="btn-group"><a href="{% url 'skin-report-detail' item.report.id %}" class="btn-sm btn-view">👁️ View</a>{% if item.is_deleted_by_user %}<a href="{% url 'admin-skin-restore-report' item.report.id %}" class="btn-sm btn-restore" onclick="return confirm('Restore this report?')">🔄 Restore</a>{% endif %}<a href="{% url 'admin-skin-delete-report' item.report.id %}" class="btn-sm btn-delete" onclick="return confirm('⚠️ PERMANENT DELETE?')">🗑️ Delete</a></div></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📭</div><p>No skin analysis reports found</p><small>Reports will appear here when users analyze skincare products</small></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Bulk Delete Modal -->
+<div id="bulkDeleteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-size:48px;">🗑️</div>
+        <h3>Bulk Delete Reports</h3>
+        <p>Delete <strong id="bulkDeleteCount">0</strong> report(s)?</p>
+        <div id="bulkDeleteList" style="max-height:200px;overflow-y:auto;text-align:left;margin:15px 0;padding:10px;background:#f7fafc;border-radius:8px;font-size:12px;"></div>
+        <div class="warning-text">⚠️ This action cannot be undone!</div>
+        <div class="modal-buttons"><button class="modal-confirm" onclick="confirmBulkDelete()">Yes, Delete All</button><button class="modal-cancel" onclick="closeBulkModal()">Cancel</button></div>
+    </div>
+</div>
+
+<script>
+    let selectedReports = new Set();
+    let originalRowsOrder = [];
+    let currentSearchTerm = '';
+    
+    // ========== SEARCH FUNCTION - On Button Click ==========
+    function performSearch() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        currentSearchTerm = searchTerm;
+        
+        const tbody = document.getElementById('reportsTableBody');
+        const rows = Array.from(document.querySelectorAll('.report-row'));
+        let visibleCount = 0;
+        
+        // Store original order if not already stored
+        if (originalRowsOrder.length === 0 && rows.length > 0) {
+            originalRowsOrder = [...rows];
+        }
+        
+        // Separate matched and unmatched rows
+        const matchedRows = [];
+        const unmatchedRows = [];
+        
+        rows.forEach(row => {
+            const username = row.getAttribute('data-username') || '';
+            const isMatch = searchTerm === '' || username.includes(searchTerm);
+            
+            if (isMatch) {
+                visibleCount++;
+                row.style.display = '';
+                row.classList.remove('hidden-row');
+                if (searchTerm !== '') {
+                    row.classList.add('highlight-row');
+                } else {
+                    row.classList.remove('highlight-row');
+                }
+                matchedRows.push(row);
+            } else {
+                row.style.display = 'none';
+                row.classList.add('hidden-row');
+                row.classList.remove('highlight-row');
+                unmatchedRows.push(row);
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox) checkbox.checked = false;
+            }
+        });
+        
+        // Reorder DOM - matched rows come FIRST (at the TOP)
+        if (searchTerm !== '' && matchedRows.length > 0) {
+            while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+            matchedRows.forEach(row => tbody.appendChild(row));
+            unmatchedRows.forEach(row => tbody.appendChild(row));
+            
+            // Show success message
+            showToast(`Found ${visibleCount} report(s) for "${searchTerm}"`, 'success');
+        } else if (searchTerm === '') {
+            // Restore original order
+            if (originalRowsOrder.length > 0) {
+                while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+                originalRowsOrder.forEach(row => tbody.appendChild(row));
+            }
+            showToast('All reports restored', 'info');
+        } else if (matchedRows.length === 0 && searchTerm !== '') {
+            showToast(`No reports found for "${searchTerm}"`, 'error');
+        }
+        
+        // Update search stats
+        const searchStats = document.getElementById('searchStats');
+        const totalRows = rows.length;
+        if (searchTerm === '') {
+            searchStats.innerHTML = `📊 Showing all ${totalRows} reports`;
+        } else {
+            searchStats.innerHTML = `🎯 Found ${visibleCount} of ${totalRows} reports`;
+        }
+        
+        updateBulkActions();
+    }
+    
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        performSearch();
+    }
+    
+    // ========== BULK SELECT FUNCTIONS ==========
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const visibleRows = document.querySelectorAll('.report-row:not(.hidden-row)');
+        const checkboxes = document.querySelectorAll('.report-row:not(.hidden-row) .row-checkbox');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+            if (checkbox.checked) selectedReports.add(parseInt(checkbox.dataset.reportId));
+            else selectedReports.delete(parseInt(checkbox.dataset.reportId));
+        });
+        updateBulkActions();
+    }
+    
+    function updateBulkActions() {
+        const visibleCheckboxes = document.querySelectorAll('.report-row:not(.hidden-row) .row-checkbox');
+        const bulkBar = document.getElementById('bulkActionsBar');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        
+        selectedReports.clear();
+        visibleCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) selectedReports.add(parseInt(checkbox.dataset.reportId));
+        });
+        
+        const count = selectedReports.size;
+        selectedCountSpan.innerText = count;
+        count > 0 ? bulkBar.classList.add('show') : bulkBar.classList.remove('show');
+        
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const totalVisible = visibleCheckboxes.length;
+        const checkedVisible = Array.from(visibleCheckboxes).filter(cb => cb.checked).length;
+        
+        if (totalVisible > 0 && checkedVisible === totalVisible) {
+            selectAll.checked = true;
+            selectAll.indeterminate = false;
+        } else if (checkedVisible > 0 && checkedVisible < totalVisible) {
+            selectAll.checked = false;
+            selectAll.indeterminate = true;
+        } else {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        }
+    }
+    
+    // ========== BULK DELETE FUNCTIONS ==========
+    function showBulkDeleteModal() {
+        if (selectedReports.size === 0) { showToast('No reports selected!', 'error'); return; }
+        
+        document.getElementById('bulkDeleteCount').innerText = selectedReports.size;
+        let listHtml = '<ul style="margin:0; padding-left:20px;">';
+        document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
+            listHtml += `<li>${checkbox.dataset.productName || 'Unknown'}</li>`;
+        });
+        listHtml += '</ul>';
+        document.getElementById('bulkDeleteList').innerHTML = listHtml;
+        document.getElementById('bulkDeleteModal').style.display = 'flex';
+    }
+    
+    function confirmBulkDelete() {
+        if (selectedReports.size === 0) return;
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "/dashboard/skin-bulk-delete/";
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        
+        const idsInput = document.createElement('input');
+        idsInput.type = 'hidden';
+        idsInput.name = 'report_ids';
+        idsInput.value = JSON.stringify(Array.from(selectedReports));
+        form.appendChild(idsInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    function closeBulkModal() { document.getElementById('bulkDeleteModal').style.display = 'none'; }
+    
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast-message toast-${type}`;
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // Enter key support
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') performSearch();
+    });
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('bulkDeleteModal');
+        if (event.target === modal) closeBulkModal();
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Skin Reports Page Loaded');
+        filterReports = performSearch; // Fallback
+    });
+</script>
+{% endblock %}

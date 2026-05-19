@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Your Skin Profile | AI Smart Care{% endblock %}
+
+{% block content %}
+<style>
+    .profile-setup {
+        max-width: 800px;
+        margin: 60px auto;
+        padding: 20px;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 32px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .profile-card h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: #1A1A1A;
+    }
+    
+    .profile-card .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #1A1A1A;
+    }
+    
+    select, input {
+        width: 100%;
+        padding: 14px;
+        border: 2px solid #E0E0E0;
+        border-radius: 12px;
+        font-size: 16px;
+    }
+    
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .checkbox-item input {
+        width: auto;
+    }
+    
+    .save-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #D4AF37, #996515);
+        color: #1A1A1A;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+    }
+</style>
+
+<div class="profile-setup">
+    <div class="profile-card">
+        <h1>✨ Your Skin Profile</h1>
+        <p class="subtitle">Help us personalize your skincare analysis with accurate recommendations</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Skin Type</label>
+                <select name="skin_type">
+                    <option value="oily" {% if profile.skin_type == 'oily' %}selected{% endif %}>🔥 Oily Skin</option>
+                    <option value="dry" {% if profile.skin_type == 'dry' %}selected{% endif %}>💧 Dry Skin</option>
+                    <option value="combination" {% if profile.skin_type == 'combination' %}selected{% endif %}>🔄 Combination Skin</option>
+                    <option value="normal" {% if profile.skin_type == 'normal' %}selected{% endif %}>✨ Normal Skin</option>
+                    <option value="sensitive" {% if profile.skin_type == 'sensitive' %}selected{% endif %}>🌸 Sensitive Skin</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Skin Concerns (Select all that apply)</label>
+                <div class="checkbox-group">
+                    {% for concern in common_concerns %}
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="skin_concerns" value="{{ concern }}"
+                               {% if concern in profile.skin_concerns %}checked{% endif %}>
+                        {{ concern }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Known Allergies (Select all that apply)</label>
+                <div class="checkbox-group">
+                    {% for allergy in common_allergies %}
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="allergies" value="{{ allergy }}"
+                               {% if allergy in profile.allergies %}checked{% endif %}>
+                        {{ allergy }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <button type="submit" class="save-btn">
+                💾 Save & Continue
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

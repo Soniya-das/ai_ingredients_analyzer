@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .report-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .report-header {
+        text-align: center;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 2rem;
+    }
+
+    .status-large {
+        font-size: 2rem;
+        padding: 1rem;
+        border-radius: 20px;
+        display: inline-block;
+        margin: 1rem 0;
+    }
+
+    .status-safe { background: #c6f6d5; color: #22543d; }
+    .status-moderate { background: #feebc8; color: #7b341e; }
+    .status-harmful { background: #fed7d7; color: #742a2a; }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-box {
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
+
+    .recommendation {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 15px;
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .ingredient-section {
+        margin-top: 2rem;
+        border-top: 2px solid #e2e8f0;
+        padding-top: 2rem;
+    }
+
+    .ingredient-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: #f7fafc;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .ingredient-list {
+        background: #f7fafc;
+        border-radius: 20px;
+        padding: 1.5rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .ingredient-item {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .ingredient-item:last-child {
+        border-bottom: none;
+    }
+
+    .ingredient-badge {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .badge-safe { background: #48bb78; }
+    .badge-moderate { background: #ed8936; }
+    .badge-harmful { background: #f56565; }
+
+    .empty-list {
+        text-align: center;
+        padding: 2rem;
+        color: #718096;
+    }
+
+    .count-info {
+        font-size: 0.8rem;
+        color: #718096;
+        margin-top: 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        color: #2d3748;
+    }
+
+    @media (max-width: 768px) {
+        .report-container {
+            padding: 1.5rem;
+        }
+        .stats-grid {
+            gap: 0.5rem;
+        }
+        .stat-box {
+            padding: 1rem;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="report-container">
+    <div class="report-header">
+        <h1>📋 Analysis Report</h1>
+        <p><strong>Product:</strong> {{ report.product_name }}</p>
+        <p><strong>Report ID:</strong> #{{ report.id }}</p>
+        <p><strong>Analyzed on:</strong> {{ report.analyzed_at|date:"F j, Y, g:i a" }}</p>
+        <div class="status-large status-{{ report.overall_status }}">
+            {% if report.overall_status == 'safe' %}
+                ✅ SAFE TO USE
+            {% elif report.overall_status == 'moderate' %}
+                ⚠️ USE WITH CAUTION
+            {% else %}
+                ❌ NOT RECOMMENDED
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Clickable Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-box" onclick="showIngredientTab('safe')">
+            <div class="stat-value" style="color: #38a169;">{{ report.safe_ingredients }}</div>
+            <div>✅ Safe Ingredients</div>
+            <div class="count-info">👇 Click to view list</div>
+        </div>
+        <div class="stat-box" onclick="showIngredientTab('moderate')">
+            <div class="stat-value" style="color: #ed8936;">{{ report.moderate_ingredients }}</div>
+            <div>⚠️ Moderate Ingredients</div>
+            <div class="count-info">👇 Click to view list</div>
+        </div>
+        <div class="stat-box" onclick="showIngredientTab('harmful')">
+            <div class="stat-value" style="color: #e53e3e;">{{ report.harmful_ingredients }}</div>
+            <div>❌ Harmful Ingredients</div>
+            <div class="count-info">👇 Click to view list</div>
+        </div>
+    </div>
+
+    <div class="recommendation">
+        <h3>💡 Recommendation</h3>
+        <p>{{ report.recommendation }}</p>
+    </div>
+
+    <div class="btn-actions">
+        <a href="{% url 'analyzer' %}" class="btn btn-primary">🔬 New Analysis</a>
+    </div>
+
+    <!-- Ingredient List Section -->
+    <div class="ingredient-section">
+        <div class="ingredient-tabs">
+            <button class="tab-btn" onclick="showIngredientTab('safe')">✅ Safe ({{ safe_ingredients|length }})</button>
+            <button class="tab-btn" onclick="showIngredientTab('moderate')">⚠️ Moderate ({{ moderate_ingredients|length }})</button>
+            <button class="tab-btn" onclick="showIngredientTab('harmful')">❌ Harmful ({{ harmful_ingredients|length }})</button>
+        </div>
+
+        <div id="safe-list" class="ingredient-list" style="display: none;">
+            {% if safe_ingredients %}
+                {% for item in safe_ingredients %}
+                <div class="ingredient-item">
+                    <span class="ingredient-badge badge-safe"></span>
+                    <span>✅ {{ item.name }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-list">✨ No safe ingredients found</div>
+            {% endif %}
+        </div>
+
+        <div id="moderate-list" class="ingredient-list" style="display: none;">
+            {% if moderate_ingredients %}
+                {% for item in moderate_ingredients %}
+                <div class="ingredient-item">
+                    <span class="ingredient-badge badge-moderate"></span>
+                    <span>⚠️ {{ item.name }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-list">✨ No moderate ingredients found</div>
+            {% endif %}
+        </div>
+
+        <div id="harmful-list" class="ingredient-list" style="display: none;">
+            {% if harmful_ingredients %}
+                {% for item in harmful_ingredients %}
+                <div class="ingredient-item">
+                    <span class="ingredient-badge badge-harmful"></span>
+                    <span>❌ {{ item.name }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-list">🎉 No harmful ingredients found! This product is safe.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function showIngredientTab(type) {
+        document.getElementById('safe-list').style.display = 'none';
+        document.getElementById('moderate-list').style.display = 'none';
+        document.getElementById('harmful-list').style.display = 'none';
+        
+        if (type === 'safe') {
+            document.getElementById('safe-list').style.display = 'block';
+        } else if (type === 'moderate') {
+            document.getElementById('moderate-list').style.display = 'block';
+        } else if (type === 'harmful') {
+            document.getElementById('harmful-list').style.display = 'block';
+        }
+        
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        let targetButton = null;
+        for (let btn of tabs) {
+            if (btn.textContent.includes(type === 'safe' ? 'Safe' : type === 'moderate' ? 'Moderate' : 'Harmful')) {
+                targetButton = btn;
+                break;
+            }
+        }
+        if (targetButton) targetButton.classList.add('active');
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if safe_ingredients %}
+            showIngredientTab('safe');
+        {% elif moderate_ingredients %}
+            showIngredientTab('moderate');
+        {% else %}
+            showIngredientTab('harmful');
+        {% endif %}
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Ingredient | Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container {
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .admin-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .admin-header h2 {
+        margin: 0;
+        color: #1A1A1A;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #3498DB, #2980B9);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-cancel {
+        background: #95A5A6;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-left: 10px;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #666;
+        text-decoration: none;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h2>✏️ Edit Ingredient: {{ ingredient.name }}</h2>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Ingredient Name</label>
+            <input type="text" name="name" value="{{ ingredient.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Category</label>
+            <select name="category" required>
+                <option value="safe" {% if ingredient.category == 'safe' %}selected{% endif %}>✅ Safe</option>
+                <option value="moderate" {% if ingredient.category == 'moderate' %}selected{% endif %}>⚠️ Moderate</option>
+                <option value="harmful" {% if ingredient.category == 'harmful' %}selected{% endif %}>❌ Harmful</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="3">{{ ingredient.description }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Side Effects</label>
+            <textarea name="side_effects" rows="2">{{ ingredient.side_effects }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Suitable For</label>
+            <input type="text" name="suitable_for" value="{{ ingredient.suitable_for }}">
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn-save">💾 Save Changes</button>
+            <a href="{% url 'manage-ingredients' %}" class="btn-cancel">Cancel</a>
+        </div>
+    </form>
+    
+    <a href="{% url 'manage-ingredients' %}" class="back-link">← Back to Ingredients List</a>
+</div>
+{% endblock %}

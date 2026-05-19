@@ -1,0 +1,628 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ========== ULTRA LUXURY PROFESSIONAL DASHBOARD ========== */
+    
+    :root {
+        --primary: #667eea;
+        --primary-dark: #5a67d8;
+        --secondary: #764ba2;
+        --accent: #f093fb;
+        --dark: #0f172a;
+        --darker: #020617;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --gray-light: #f8fafc;
+        --gray: #64748b;
+    }
+
+    /* Modern Reset & Base */
+    .luxury-pro-dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Animated Background */
+    .animated-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -2;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        opacity: 0.05;
+    }
+
+    /* Glass Hero Section */
+    .glass-hero {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 48px;
+        padding: 48px;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .glass-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+    }
+
+    .hero-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .hero-left {
+        flex: 1;
+    }
+
+    .premium-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #667eea20, #764ba220);
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--primary-dark);
+        margin-bottom: 20px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .greeting {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 12px;
+    }
+
+    .greeting span {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        color: var(--gray);
+        line-height: 1.5;
+        max-width: 500px;
+    }
+
+    .hero-right {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        padding: 24px;
+        border-radius: 32px;
+        min-width: 220px;
+        text-align: center;
+        border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .hero-stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1.2;
+    }
+
+    .hero-stat-label {
+        font-size: 0.75rem;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 4px;
+    }
+
+    .stat-divider {
+        margin: 16px 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+    }
+
+    /* Premium Stats Grid - 3 cards only (removed Analytics Hub) */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 28px;
+        padding: 24px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 30px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        transform: scaleX(0);
+        transition: transform 0.4s;
+    }
+
+    .stat-card:hover::after {
+        transform: scaleX(1);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+        display: inline-block;
+    }
+
+    .stat-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    .stat-desc {
+        font-size: 0.75rem;
+        color: var(--gray);
+    }
+
+    /* Reports Section Premium */
+    .reports-premium {
+        background: white;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .reports-header-premium {
+        padding: 28px 32px;
+        background: linear-gradient(135deg, #faf9ff, #ffffff);
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .header-left h3 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 0 0 4px 0;
+    }
+
+    .header-left p {
+        font-size: 0.8rem;
+        color: var(--gray);
+        margin: 0;
+    }
+
+    .btn-outline-premium {
+        background: transparent;
+        border: 2px solid #e2e8f0;
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #475569;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-outline-premium:hover {
+        background: #1e293b;
+        border-color: #1e293b;
+        color: white;
+        transform: translateX(4px);
+    }
+
+    /* Report Items */
+    .report-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 32px;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .report-item:hover {
+        background: linear-gradient(90deg, #f8fafc, #ffffff);
+        transform: translateX(4px);
+    }
+
+    .report-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+    }
+
+    .report-icon-circle {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+
+    .report-meta h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 4px 0;
+    }
+
+    .report-meta .date {
+        font-size: 0.7rem;
+        color: #94a3b8;
+    }
+
+    .report-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    /* Premium Badges */
+    .badge-premium {
+        padding: 6px 14px;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge-safe {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .badge-moderate {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .badge-harmful {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .badge-unknown {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        color: white;
+    }
+
+    .stats-mini-premium {
+        text-align: right;
+    }
+
+    .stats-numbers {
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .safe-text {
+        color: #10b981;
+    }
+
+    .harmful-text {
+        color: #ef4444;
+    }
+
+    /* Empty State Premium */
+    .empty-premium {
+        text-align: center;
+        padding: 60px 32px;
+        background: linear-gradient(135deg, #faf9ff, #ffffff);
+    }
+
+    .empty-icon-premium {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.6;
+    }
+
+    .empty-title-premium {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .empty-text-premium {
+        color: #94a3b8;
+        margin-bottom: 24px;
+    }
+
+    .btn-primary-premium {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 40px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    /* Floating Action Button */
+    .fab-premium {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s;
+        z-index: 100;
+        text-decoration: none;
+    }
+
+    .fab-premium:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 28px rgba(102, 126, 234, 0.5);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .glass-hero, .stat-card, .reports-premium {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.2s; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .glass-hero {
+            padding: 32px 24px;
+        }
+        
+        .greeting {
+            font-size: 1.8rem;
+        }
+        
+        .report-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .report-right {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .fab-premium {
+            bottom: 20px;
+            right: 20px;
+        }
+        
+        .hero-right {
+            min-width: 180px;
+        }
+        
+        .hero-stat-value {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="luxury-pro-dashboard">
+    <div class="animated-bg"></div>
+
+    <!-- Glass Hero Section -->
+    <div class="glass-hero">
+        <div class="hero-content">
+            <div class="hero-left">
+                <div class="premium-badge">
+                    ✨ PREMIUM MEMBER
+                </div>
+                <h1 class="greeting">
+                    Welcome back, <span>{{ user.username }}</span> 👋
+                </h1>
+                <p class="hero-subtitle">
+                    Your AI-powered ingredient safety analyst. Making informed decisions with cutting-edge technology.
+                </p>
+            </div>
+            <div class="hero-right">
+                <div class="hero-stat-value">{{ total_reports|default:"0" }}</div>
+                <div class="hero-stat-label">Total Analyses</div>
+                <div class="stat-divider"></div>
+                <div class="hero-stat-value">{{ safe_percentage|default:"0" }}%</div>
+                <div class="hero-stat-label">Safety Score</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Stats Grid - 3 cards (Analytics Hub removed) -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="location.href='{% url 'analyzer' %}'">
+            <div class="stat-icon">✨</div>
+            <div class="stat-title">Quick Analysis</div>
+            <div class="stat-desc">Instant AI ingredient checking</div>
+        </div>
+        
+        <div class="stat-card" onclick="location.href='{% url 'search-product' %}'">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-title">Smart Search</div>
+            <div class="stat-desc">Find products by name</div>
+        </div>
+        
+        <div class="stat-card" onclick="location.href='{% url 'profile' %}'">
+            <div class="stat-icon">⚙️</div>
+            <div class="stat-title">Preferences</div>
+            <div class="stat-desc">Customize your experience</div>
+        </div>
+    </div>
+
+    <!-- Recent Reports Premium Section -->
+    <div class="reports-premium">
+        <div class="reports-header-premium">
+            <div class="header-left">
+                <h3>Recent Analyses</h3>
+                <p>Your latest ingredient safety reports</p>
+            </div>
+            <a href="{% url 'report-history' %}" class="btn-outline-premium">
+                View All →
+            </a>
+        </div>
+        
+        <div class="reports-list-premium">
+            {% if reports %}
+                {% for report in reports %}
+                <div class="report-item" onclick="location.href='{% url 'report' report.id %}'">
+                    <div class="report-left">
+                        <div class="report-icon-circle">
+                            {% if report.overall_status == 'safe' %}✅
+                            {% elif report.overall_status == 'moderate' %}⚠️
+                            {% elif report.overall_status == 'harmful' %}❌
+                            {% else %}🔬
+                            {% endif %}
+                        </div>
+                        <div class="report-meta">
+                            <h4>{{ report.product_name|truncatechars:40 }}</h4>
+                            <div class="date">{{ report.analyzed_at|date:"F j, Y \a\t g:i A" }}</div>
+                        </div>
+                    </div>
+                    <div class="report-right">
+                        <span class="badge-premium badge-{{ report.overall_status }}">
+                            {{ report.overall_status|upper }}
+                        </span>
+                        <div class="stats-mini-premium">
+                            <div class="stats-numbers">
+                                <span class="safe-text">✓ {{ report.safe_ingredients|default:0 }}</span>
+                                <span style="margin: 0 6px; color: #cbd5e1;">|</span>
+                                <span class="harmful-text">⚠ {{ report.harmful_ingredients|default:0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-premium">
+                    <div class="empty-icon-premium">🔬✨</div>
+                    <div class="empty-title-premium">No Reports Yet</div>
+                    <div class="empty-text-premium">
+                        Start your journey to safer skincare today.<br>
+                        Analyze your first product and get instant AI insights.
+                    </div>
+                    <a href="{% url 'analyzer' %}" class="btn-primary-premium">
+                        🚀 Start Your First Analysis
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <a href="{% url 'analyzer' %}" class="fab-premium" title="New Analysis">
+        ✨
+    </a>
+</div>
+
+<script>
+    // Add smooth click handling for stat cards and report items
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (this.getAttribute('onclick')) {
+                const match = this.getAttribute('onclick').match(/'(.*?)'/);
+                if (match && match[1]) {
+                    window.location.href = match[1];
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

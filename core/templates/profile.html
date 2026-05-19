@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 30px;
+        padding: 3rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 3rem;
+        color: white;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-update {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .info-box {
+        background: #f7fafc;
+        padding: 1rem;
+        border-radius: 15px;
+        margin-top: 1rem;
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="avatar">
+            {{ user.username|first|upper }}
+        </div>
+        <h2>{{ user.username }}</h2>
+        <p>{{ user.email }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" name="phone" value="{{ profile.phone }}">
+        </div>
+        <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" name="date_of_birth" value="{{ profile.date_of_birth|date:'Y-m-d' }}">
+        </div>
+        <div class="form-group">
+            <label>Skin Type</label>
+            <select name="skin_type">
+                <option value="">Select...</option>
+                <option value="oily" {% if profile.skin_type == 'oily' %}selected{% endif %}>Oily</option>
+                <option value="dry" {% if profile.skin_type == 'dry' %}selected{% endif %}>Dry</option>
+                <option value="combination" {% if profile.skin_type == 'combination' %}selected{% endif %}>Combination</option>
+                <option value="normal" {% if profile.skin_type == 'normal' %}selected{% endif %}>Normal</option>
+                <option value="sensitive" {% if profile.skin_type == 'sensitive' %}selected{% endif %}>Sensitive</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-update">Update Profile</button>
+    </form>
+
+    <div class="info-box">
+        <strong>ℹ️ Account Info:</strong><br>
+        Member since: {{ user.date_joined|date:"F j, Y" }}<br>
+        Last login: {{ user.last_login|date:"F j, Y, g:i a" }}
+    </div>
+</div>
+{% endblock %}

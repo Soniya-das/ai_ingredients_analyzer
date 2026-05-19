@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Ingredients | Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container {
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+    
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .admin-header h2 {
+        margin: 0;
+        color: #1A1A1A;
+    }
+    
+    .btn-add {
+        background: linear-gradient(135deg, #27AE60, #1E8449);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .ingredient-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .ingredient-table th,
+    .ingredient-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .ingredient-table th {
+        background: #f7fafc;
+        font-weight: bold;
+        color: #2d3748;
+    }
+    
+    .badge-safe {
+        background: #48bb78;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .badge-moderate {
+        background: #ed8936;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .badge-harmful {
+        background: #f56565;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .action-btns {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .btn-edit {
+        background: #3498DB;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+    
+    .btn-delete {
+        background: #E74C3C;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+    
+    .btn-edit:hover, .btn-delete:hover {
+        opacity: 0.8;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #666;
+        text-decoration: none;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h2>📋 Manage Ingredients</h2>
+        <a href="{% url 'add-ingredient' %}" class="btn-add">+ Add New Ingredient</a>
+    </div>
+    
+    <table class="ingredient-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ingredient Name</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ingredient in ingredients %}
+            <tr>
+                <td>{{ ingredient.id }}</td>
+                <td><strong>{{ ingredient.name }}</strong></td>
+                <td>
+                    <span class="badge-{{ ingredient.category }}">
+                        {{ ingredient.category|upper }}
+                    </span>
+                </td>
+                <td>{{ ingredient.description|truncatechars:50 }}</td>
+                <td class="action-btns">
+                    <a href="{% url 'edit-ingredient' ingredient.id %}" class="btn-edit">Edit</a>
+                    <a href="{% url 'delete-ingredient' ingredient.id %}" class="btn-delete" onclick="return confirm('Delete {{ ingredient.name }}?')">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No ingredients found. <a href="{% url 'add-ingredient' %}">Add your first ingredient</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <a href="{% url 'admin-dashboard' %}" class="back-link">← Back to Dashboard</a>
+</div>
+{% endblock %}

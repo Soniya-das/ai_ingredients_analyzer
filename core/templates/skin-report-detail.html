@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Full Analysis Report | {{ report.product_name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Similar luxury styles as above */
+    .report-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .report-header {
+        background: linear-gradient(135deg, #1A1A1A, #2C2C2C);
+        border-radius: 32px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+    }
+    
+    .report-date {
+        color: var(--luxury-gold);
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .report-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .score-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(212,175,55,0.2);
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-card {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .info-card h3 {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .info-card .value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1A1A1A;
+    }
+    
+    .export-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--luxury-gold);
+        color: #1A1A1A;
+        padding: 15px 25px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        z-index: 100;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(212,175,55,0.4);
+    }
+</style>
+
+<div class="report-container">
+    <div class="report-header">
+        <div class="report-date">
+            Analyzed on: {{ report.analyzed_at|date:"F j, Y, g:i a" }}
+        </div>
+        <h1 class="report-title">{{ report.product_name }}</h1>
+        <div class="score-badge">
+            <span>Overall Score:</span>
+            <strong>{{ report.overall_score }}/100</strong>
+            <span>{{ report.overall_verdict|upper }}</span>
+        </div>
+    </div>
+    
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>🔬 Safety Score</h3>
+            <div class="value">{{ report.safety_score }}/100</div>
+        </div>
+        <div class="info-card">
+            <h3>🎯 Skin Compatibility</h3>
+            <div class="value">{{ report.skin_compatibility_score }}/100</div>
+        </div>
+        <div class="info-card">
+            <h3>✨ Efficacy Score</h3>
+            <div class="value">{{ report.efficacy_score }}/100</div>
+        </div>
+        <div class="info-card">
+            <h3>📊 Total Ingredients</h3>
+            <div class="value">{{ report.ingredients_analyzed|length }}</div>
+        </div>
+    </div>
+    
+    <!-- Add more detailed sections as needed -->
+</div>
+
+<a href="#" onclick="window.print(); return false;" class="export-btn">
+    📄 Export Report (PDF)
+</a>
+{% endblock %}

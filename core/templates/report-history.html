@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    .history-container {
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(2px);
+        border-radius: 48px;
+        padding: 2rem 2.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        transition: all 0.3s ease;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .history-container h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1e1e2f, #3a2c4a);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.8rem;
+        margin: 2.5rem 0;
+    }
+    
+    @media (max-width: 1000px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+        .stats-grid { grid-template-columns: 1fr; }
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: white;
+        padding: 1.8rem 1rem;
+        border-radius: 32px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        cursor: pointer;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 35px -10px rgba(0,0,0,0.3);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.6s;
+    }
+    
+    .stat-card:hover::before {
+        left: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 30px 45px -12px rgba(0,0,0,0.4);
+        border-color: rgba(255,255,255,0.3);
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 0.75rem;
+    }
+    
+    .stat-sub {
+        font-size: 0.75rem;
+        opacity: 0.85;
+        margin-top: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .click-hint {
+        font-size: 0.7rem;
+        margin-top: 1rem;
+        opacity: 0.7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        background: rgba(255,255,255,0.1);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0.2rem 0.8rem;
+        border-radius: 40px;
+    }
+    
+    /* specific stat card overrides */
+    .stat-card[data-type="safe"] { background: linear-gradient(135deg, #1f7b4d, #0c5e3a); }
+    .stat-card[data-type="moderate"] { background: linear-gradient(135deg, #e67e22, #b45f1b); }
+    .stat-card[data-type="harmful"] { background: linear-gradient(135deg, #e53e3e, #b91c1c); }
+    .stat-card[data-type="total"] { background: linear-gradient(135deg, #2d3748, #1a202c); }
+    
+    .report-list {
+        margin-top: 2rem;
+    }
+    
+    .report-list h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d2a3e;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.01em;
+    }
+    
+    .report-card {
+        background: #ffffffdd;
+        backdrop-filter: blur(8px);
+        border-radius: 28px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.25rem;
+        transition: all 0.35s ease;
+        cursor: pointer;
+        border-left: 6px solid;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+    
+    .report-card:hover {
+        transform: translateX(8px) translateY(-3px);
+        box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+        background: white;
+        border-left-width: 8px;
+    }
+    
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    
+    .title-area {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .report-product {
+        font-weight: 800;
+        font-size: 1.25rem;
+        color: #1f1b2e;
+        background: #f0f0f5;
+        padding: 0.2rem 1rem;
+        border-radius: 40px;
+        letter-spacing: -0.2px;
+    }
+    
+    .report-id {
+        color: #64748b;
+        font-weight: 500;
+        font-size: 0.85rem;
+        background: #f1f5f9;
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+    }
+    
+    .report-date {
+        color: #475569;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #f8fafc;
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+    }
+    
+    .delete-btn {
+        background: rgba(239,68,68,0.1);
+        border: none;
+        font-size: 1.3rem;
+        cursor: pointer;
+        color: #ef4444;
+        transition: all 0.2s;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .delete-btn:hover {
+        background: #ef4444;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(239,68,68,0.4);
+    }
+    
+    .ingredients-summary {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin: 0.75rem 0;
+    }
+    
+    .ingredient-count {
+        font-weight: 600;
+        font-size: 0.9rem;
+        background: #f8f9fc;
+        padding: 0.2rem 0.8rem;
+        border-radius: 40px;
+    }
+    
+    .recommendation-text {
+        font-size: 0.85rem;
+        color: #334155;
+        background: #f1f5f9;
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        max-width: 65%;
+    }
+    
+    .status-badge {
+        padding: 0.35rem 1.2rem;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    
+    .border-safe { border-left-color: #2b9348; }
+    .border-moderate { border-left-color: #e9a23b; }
+    .border-harmful { border-left-color: #e63946; }
+    
+    .status-safe { background: #d9f0e1; color: #1e6f3f; }
+    .status-moderate { background: #fde4cf; color: #b45f1b; }
+    .status-harmful { background: #ffe0e0; color: #b91c1c; }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: #faf9fe;
+        border-radius: 48px;
+        margin-top: 2rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-analyze {
+        display: inline-block;
+        background: linear-gradient(135deg, #5940b3, #7f5ad0);
+        color: white;
+        padding: 12px 32px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(89,64,179,0.3);
+    }
+    
+    .btn-analyze:hover {
+        transform: scale(1.02);
+        background: linear-gradient(135deg, #4a34a3, #6b48b5);
+        color: white;
+        box-shadow: 0 8px 20px rgba(89,64,179,0.4);
+    }
+    
+    @keyframes fadeSlide {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .report-card {
+        animation: fadeSlide 0.4s ease-out forwards;
+    }
+</style>
+
+<div class="history-container">
+    <h2>📊 Report History</h2>
+    <p style="color: #4b5563; font-weight: 500;">Your complete analysis history — tap any card to view full insights</p>
+
+    {% if reports %}
+    <div class="stats-grid">
+        <div class="stat-card" data-type="total">
+            <div class="stat-number">{{ total_analyzed }}</div>
+            <div class="stat-label">Total Reports</div>
+            <div class="stat-sub">📋 All analyses</div>
+        </div>
+        <a href="{% url 'filter-by-status' 'safe' %}" class="stat-card" data-type="safe" style="text-decoration: none;">
+            <div class="stat-number">{{ safe_reports }}</div>
+            <div class="stat-label">✅ Safe</div>
+            <div class="stat-sub">Low‑risk products</div>
+            <div class="click-hint">⬇️ View safe</div>
+        </a>
+        <a href="{% url 'filter-by-status' 'moderate' %}" class="stat-card" data-type="moderate" style="text-decoration: none;">
+            <div class="stat-number">{{ moderate_reports }}</div>
+            <div class="stat-label">⚠️ Moderate</div>
+            <div class="stat-sub">Caution advised</div>
+            <div class="click-hint">⬇️ View moderate</div>
+        </a>
+        <a href="{% url 'filter-by-status' 'harmful' %}" class="stat-card" data-type="harmful" style="text-decoration: none;">
+            <div class="stat-number">{{ harmful_reports }}</div>
+            <div class="stat-label">❌ Harmful</div>
+            <div class="stat-sub">Avoid these</div>
+            <div class="click-hint">⬇️ View harmful</div>
+        </a>
+    </div>
+
+    <div class="report-list">
+        <h3>📬 Your analysis reports</h3>
+        {% for report in reports %}
+        <div class="report-card border-{{ report.overall_status }}" data-report-id="{{ report.id }}">
+            <div class="report-header">
+                <div class="title-area">
+                    <span class="report-product">📦 {{ report.product_name }}</span>
+                    <span class="report-id">#{{ report.id }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="report-date">{{ report.analyzed_at|date:"F j, Y, g:i a" }}</div>
+                    <form method="post" action="{% url 'delete_report' report.id %}" class="delete-form" style="display: inline;" onsubmit="return confirmDelete(event)">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn" title="Delete this report">🗑️</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="ingredients-summary">
+                <span class="ingredient-count" style="color: #2b9348;">✅ Safe: {{ report.safe_ingredients }}</span>
+                <span class="ingredient-count" style="color: #e9a23b;">⚠️ Moderate: {{ report.moderate_ingredients }}</span>
+                <span class="ingredient-count" style="color: #e63946;">❌ Harmful: {{ report.harmful_ingredients }}</span>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div class="recommendation-text">
+                    💡 {{ report.recommendation|truncatechars:100 }}
+                </div>
+                <span class="status-badge status-{{ report.overall_status }}">
+                    {% if report.overall_status == 'safe' %}
+                        ✅ SAFE
+                    {% elif report.overall_status == 'moderate' %}
+                        ⚠️ MODERATE
+                    {% elif report.overall_status == 'harmful' %}
+                        ❌ HARMFUL
+                    {% else %}
+                        {{ report.overall_status|upper }}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3 style="font-size: 1.6rem;">No reports yet</h3>
+        <p>Start your first ingredient analysis and discover product safety.</p>
+        <a href="{% url 'analyzer' %}" class="btn-analyze">
+            🚀 Analyze Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Luxury interactive: click card to view full report (skip delete button)
+    document.querySelectorAll('.report-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-btn') || e.target.closest('.delete-form')) return;
+            const reportId = card.getAttribute('data-report-id');
+            if (reportId) window.location.href = `/report/${reportId}/`;
+        });
+    });
+    
+    function confirmDelete(event) {
+        if (!confirm('✨ Delete this report permanently? This action cannot be undone.')) {
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+    
+    // subtle hover ripple effect on stat cards (optional luxury)
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('mouseenter', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple-effect';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            card.style.position = 'relative';
+            card.style.overflow = 'hidden';
+            card.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+    // add ripple style dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            width: 100px;
+            height: 100px;
+            transform: translate(-50%, -50%) scale(0);
+            animation: rippleAnim 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
+{% endblock %}

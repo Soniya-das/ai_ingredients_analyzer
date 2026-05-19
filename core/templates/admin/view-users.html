@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .users-table {
+        width: 100%;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .users-table th {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1rem;
+        font-weight: 600;
+    }
+    .users-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    .badge-admin { background: #ef4444; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-user { background: #10b981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .delete-user-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+    .delete-user-btn:hover { background: #dc2626; transform: scale(1.02); }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        padding: 1rem 2rem;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+</style>
+
+<h2 style="color: white;">📋 Registered Users</h2>
+<div class="stats-card"><p style="color:white;">Total Users: <strong>{{ user_data|length }}</strong></p></div>
+
+<div style="overflow-x: auto;">
+    <table class="users-table">
+        <thead>
+            <tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Joined</th><th>Last Login</th><th>Role</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for data in user_data %}
+            <tr id="user-row-{{ data.user.id }}">
+                <td>{{ data.user.id }}</td>
+                <td>{{ data.user.username }}{% if data.user.is_superuser %} <span class="badge-admin">Admin</span>{% endif %}</td>
+                <td>{{ data.user.email }}</td>
+                <td>{{ data.profile.phone|default:"—" }}</td>
+                <td>{{ data.user.date_joined|date:"Y-m-d H:i" }}</td>
+                <td>{{ data.user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+                <td>{% if data.user.is_superuser %}<span class="badge-admin">Admin</span>{% else %}<span class="badge-user">User</span>{% endif %}</td>
+                <td>
+                    {% if not data.user.is_superuser %}
+                    <!-- Form with manual JavaScript submission -->
+                    <form method="post" action="{% url 'admin-delete-user' data.user.id %}" id="delete-form-{{ data.user.id }}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="button" class="delete-user-btn" onclick="confirmDelete({{ data.user.id }}, '{{ data.user.username|escapejs }}')">
+                            🗑️ Delete
+                        </button>
+                    </form>
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8">No users registered.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function confirmDelete(userId, username) {
+        if (confirm(`⚠️ Permanently delete user "${username}"?\n\nAll their reports, profile, and data will be removed. This action cannot be undone.`)) {
+            document.getElementById(`delete-form-${userId}`).submit();
+        }
+    }
+</script>
+{% endblock %}

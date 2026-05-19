@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Scientific Info: {{ ingredient.name }} | AI Smart Care{% endblock %}
+
+{% block content %}
+<style>
+    .scientific-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .ingredient-header {
+        background: linear-gradient(135deg, #1A1A1A, #2C2C2C);
+        border-radius: 32px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+    }
+    
+    .ingredient-name {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .ingredient-category {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .info-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #1A1A1A;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .approval-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #D4AF37, #996515);
+        color: #1A1A1A;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .suggestion-item {
+        padding: 15px;
+        background: #F8F9FA;
+        border-radius: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .suggestion-type {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .type-recommended { color: #27AE60; }
+    .type-caution { color: #F39C12; }
+    .type-avoid { color: #E74C3C; }
+    .type-consult { color: #3498DB; }
+</style>
+
+<div class="scientific-container">
+    <div class="ingredient-header">
+        <div class="ingredient-name">🔬 {{ ingredient.name }}</div>
+        <div class="ingredient-category" style="background: {% if ingredient.category == 'safe' %}#27AE60{% elif ingredient.category == 'moderate' %}#F39C12{% else %}#E74C3C{% endif %}20; color: {% if ingredient.category == 'safe' %}#27AE60{% elif ingredient.category == 'moderate' %}#F39C12{% else %}#E74C3C{% endif %};">
+            {% if ingredient.category == 'safe' %}✅ SAFE
+            {% elif ingredient.category == 'moderate' %}⚠️ MODERATE RISK
+            {% else %}❌ HARMFUL{% endif %}
+        </div>
+    </div>
+    
+    {% if scientific %}
+    <div class="info-card">
+        <div class="info-title">
+            <span>🔬</span> Scientific Approval
+        </div>
+        <div class="approval-badge">
+            ✓ {{ scientific.get_approval_level_display }}
+        </div>
+        {% if scientific.certifying_body %}
+        <p style="margin-top: 15px;"><strong>Certifying Body:</strong> {{ scientific.certifying_body }}</p>
+        {% endif %}
+        {% if scientific.approval_date %}
+        <p><strong>Approval Date:</strong> {{ scientific.approval_date }}</p>
+        {% endif %}
+        {% if scientific.research_papers %}
+        <p><strong>Research Papers:</strong> {{ scientific.research_papers }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if derm_suggestions %}
+    <div class="info-card">
+        <div class="info-title">
+            <span>👨‍⚕️</span> Dermatologist Insights
+        </div>
+        {% for suggestion in derm_suggestions %}
+        <div class="suggestion-item">
+            <div class="suggestion-type type-{{ suggestion.suggestion_type }}">
+                {% if suggestion.suggestion_type == 'recommended' %}✅ Recommended
+                {% elif suggestion.suggestion_type == 'caution' %}⚠️ Use with Caution
+                {% elif suggestion.suggestion_type == 'avoid' %}❌ Avoid
+                {% else %}👨‍⚕️ Consult Dermatologist{% endif %}
+            </div>
+            <p style="margin-top: 8px;">{{ suggestion.suggestion_text }}</p>
+            {% if suggestion.dermatologist_name %}
+            <small style="color: #666;">- {{ suggestion.dermatologist_name }}{% if suggestion.credentials %}, {{ suggestion.credentials }}{% endif %}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if skin_recommendations %}
+    <div class="info-card">
+        <div class="info-title">
+            <span>🎯</span> Skin Type Recommendations
+        </div>
+        <div style="display: grid; gap: 15px;">
+            {% for rec in skin_recommendations %}
+            <div>
+                <strong>
+                    {% if rec.skin_type == 'oily' %}🔥 Oily
+                    {% elif rec.skin_type == 'dry' %}💧 Dry
+                    {% elif rec.skin_type == 'combination' %}🔄 Combination
+                    {% elif rec.skin_type == 'normal' %}✨ Normal
+                    {% else %}🌸 Sensitive{% endif %}
+                </strong>
+                <div style="margin-top: 5px;">
+                    <div style="background: #F0F0F0; height: 8px; border-radius: 4px; width: 100%;">
+                        <div style="background: linear-gradient(135deg, #D4AF37, #996515); width: {{ rec.suitability_score }}%; height: 100%; border-radius: 4px;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span style="font-size: 12px;">Compatibility Score</span>
+                        <span style="font-size: 12px; font-weight: 600;">{{ rec.suitability_score }}/100</span>
+                    </div>
+                </div>
+                {% if rec.recommendation_text %}
+                <p style="font-size: 14px; color: #666; margin-top: 8px;">{{ rec.recommendation_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if ingredient.description %}
+    <div class="info-card">
+        <div class="info-title">
+            <span>📝</span> Description
+        </div>
+        <p>{{ ingredient.description }}</p>
+    </div>
+    {% endif %}
+    
+    {% if ingredient.side_effects %}
+    <div class="info-card">
+        <div class="info-title">
+            <span>⚠️</span> Side Effects & Warnings
+        </div>
+        <p>{{ ingredient.side_effects }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

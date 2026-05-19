@@ -1,0 +1,831 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ===== BASE STYLES ===== */
+    .reports-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .reports-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .reports-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    
+    .reports-header p {
+        margin: 5px 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .btn-export-top {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .btn-export-top:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-2px);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    /* ===== STATISTICS CARDS ===== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .stat-label {
+        color: #666;
+        margin-top: 8px;
+        font-size: 14px;
+    }
+    
+    /* ===== BULK ACTIONS BAR ===== */
+    .bulk-actions-bar {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+    }
+    
+    .bulk-actions-bar.show {
+        display: flex;
+    }
+    
+    .selected-count {
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .btn-bulk-delete {
+        background: #dc3545;
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-bulk-delete:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+    }
+    
+    /* ===== TABLE STYLES ===== */
+    .reports-table {
+        width: 100%;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        border-collapse: collapse;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .reports-table th {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .reports-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    
+    .reports-table tr:hover {
+        background: #f7fafc;
+    }
+    
+    .select-all-checkbox, .row-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+    
+    /* ===== BADGES ===== */
+    .badge-safe {
+        background: #d4edda;
+        color: #155724;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+    
+    .badge-moderate {
+        background: #fff3cd;
+        color: #856404;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+    
+    .badge-harmful {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+    
+    .ingredient-preview {
+        font-size: 12px;
+        white-space: normal;
+        max-width: 250px;
+    }
+    
+    .ingredient-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin: 2px;
+        font-size: 10px;
+    }
+    
+    .badge-safe-badge {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-moderate-badge {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-harmful-badge {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .btn-view {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-delete {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #dc3545;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-delete:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+    
+    /* ===== MODAL ===== */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+    }
+    
+    .delete-product-name {
+        color: #dc3545;
+        font-weight: bold;
+        font-size: 18px;
+        margin: 10px 0;
+    }
+    
+    .warning-text {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 15px;
+        padding: 10px;
+        background: #f8d7da;
+        border-radius: 8px;
+    }
+    
+    .modal-buttons {
+        margin-top: 25px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .modal-confirm {
+        background: #dc3545;
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    .modal-cancel {
+        background: #718096;
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    /* ===== SEARCH ===== */
+    .search-box {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .search-btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    
+    .toast-message {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        z-index: 1100;
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .toast-success {
+        background: #28a745;
+    }
+    
+    .toast-error {
+        background: #dc3545;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .reports-table {
+            font-size: 11px;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .reports-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .header-actions {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="reports-container">
+    <div class="reports-header">
+        <div>
+            <h2>📊 Analysis Reports - Complete List</h2>
+            <p>View all ingredient analysis reports submitted by users</p>
+        </div>
+        <div class="header-actions">
+            {% if reports %}
+            <button onclick="exportToCSV()" class="btn-export-top">
+                📥 Export CSV
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_reports }}</div>
+            <div class="stat-label">Total Reports</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" style="color: #28a745;">{{ safe_count }}</div>
+            <div class="stat-label">✅ Safe Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" style="color: #ffc107;">{{ moderate_count }}</div>
+            <div class="stat-label">⚠️ Moderate Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" style="color: #dc3545;">{{ harmful_count }}</div>
+            <div class="stat-label">❌ Harmful Products</div>
+        </div>
+    </div>
+    
+    <!-- Search Box -->
+    <div class="search-box">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by product name, username, or status...">
+        <button class="search-btn" onclick="searchReports()">Search</button>
+    </div>
+    
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions-bar" id="bulkActionsBar">
+        <div>
+            ✅ <span id="selectedCount">0</span> report(s) selected
+        </div>
+        <button class="btn-bulk-delete" onclick="showBulkDeleteModal()">
+            🗑️ Delete Selected
+        </button>
+    </div>
+    
+    <!-- Reports Table -->
+    <div style="overflow-x: auto;">
+        <table class="reports-table" id="reportsTable">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" id="selectAllCheckbox" class="select-all-checkbox" onclick="toggleSelectAll()">
+                    </th>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Product Name</th>
+                    <th>Ingredients Preview</th>
+                    <th>Safe</th>
+                    <th>Moderate</th>
+                    <th>Harmful</th>
+                    <th>Status</th>
+                    <th>Analyzed On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in reports %}
+                {% with report=item.report %}
+                <tr class="report-row" data-report-id="{{ report.id }}" style="display: table-row;">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="row-checkbox" data-report-id="{{ report.id }}" onclick="updateBulkActions()">
+                    </td>
+                    <td class="col-id" style="font-weight: bold; color: #667eea;">{{ report.id }}</td>
+                    <td class="col-user">
+                        <strong class="user-name">{{ item.username_display }}</strong><br>
+                        <small class="user-email" style="color: #718096;">{{ report.user.email }}</small>
+                    </td>
+                    <td class="col-product" style="font-weight: 500;">{{ report.product_name }}</td>
+                    <td class="ingredient-preview">
+                        {% for ing in item.ingredients|slice:":4" %}
+                            <span class="ingredient-badge badge-{{ ing.status }}-badge">{{ ing.name }}</span>
+                        {% endfor %}
+                        {% if item.ingredient_count > 4 %}
+                            ... ({{ item.ingredient_count }} total)
+                        {% endif %}
+                    </td>
+                    <td class="col-safe" style="text-align: center; font-weight: bold; color: #28a745;">{{ report.safe_ingredients }}</td>
+                    <td class="col-moderate" style="text-align: center; font-weight: bold; color: #ffc107;">{{ report.moderate_ingredients }}</td>
+                    <td class="col-harmful" style="text-align: center; font-weight: bold; color: #dc3545;">{{ report.harmful_ingredients }}</td>
+                    <td class="col-status">
+                        {% if report.overall_status == 'safe' %}
+                            <span class="badge-safe">✅ Safe</span>
+                        {% elif report.overall_status == 'moderate' %}
+                            <span class="badge-moderate">⚠️ Moderate</span>
+                        {% else %}
+                            <span class="badge-harmful">❌ Harmful</span>
+                        {% endif %}
+                    </td>
+                    <td class="col-date" style="font-size: 12px; color: #666;">{{ report.analyzed_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'report' report.id %}" class="btn-view">👁️ View</a>
+                            <button class="btn-delete" onclick="showDeleteModal({{ report.id }}, '{{ report.product_name|escapejs }}')">🗑️ Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endwith %}
+                {% empty %}
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: 60px;">
+                        <div style="font-size: 48px;">📭</div>
+                        <h3>No reports found</h3>
+                        <p>No analysis reports have been submitted yet.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-size: 48px;">🗑️</div>
+        <h3>Delete Report</h3>
+        <p>Are you sure you want to delete:</p>
+        <div class="delete-product-name" id="deleteProductName"></div>
+        <div class="warning-text">⚠️ This action cannot be undone!</div>
+        <div class="modal-buttons">
+            <button class="modal-confirm" onclick="confirmDelete()">Yes, Delete</button>
+            <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Delete Confirmation Modal -->
+<div id="bulkDeleteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-size: 48px;">🗑️</div>
+        <h3>Bulk Delete Reports</h3>
+        <p>Delete <strong id="bulkDeleteCount">0</strong> report(s)?</p>
+        <div id="bulkDeleteList" style="max-height: 200px; overflow-y: auto; text-align: left; margin: 15px 0; padding: 10px; background: #f7fafc; border-radius: 8px; font-size: 12px;"></div>
+        <div class="warning-text">⚠️ This action cannot be undone!</div>
+        <div class="modal-buttons">
+            <button class="modal-confirm" onclick="confirmBulkDelete()">Yes, Delete All</button>
+            <button class="modal-cancel" onclick="closeBulkModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let deleteReportId = null;
+    let selectedReports = new Set();
+    
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+            if (checkbox.checked) {
+                selectedReports.add(parseInt(checkbox.dataset.reportId));
+            } else {
+                selectedReports.delete(parseInt(checkbox.dataset.reportId));
+            }
+        });
+        updateBulkActions();
+    }
+    
+    function updateBulkActions() {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        const bulkBar = document.getElementById('bulkActionsBar');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        
+        selectedReports.clear();
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedReports.add(parseInt(checkbox.dataset.reportId));
+            }
+        });
+        
+        const count = selectedReports.size;
+        selectedCountSpan.innerText = count;
+        
+        if (count > 0) {
+            bulkBar.classList.add('show');
+        } else {
+            bulkBar.classList.remove('show');
+        }
+    }
+    
+    function showBulkDeleteModal() {
+        if (selectedReports.size === 0) {
+            showToast('No reports selected!', 'error');
+            return;
+        }
+        
+        document.getElementById('bulkDeleteCount').innerText = selectedReports.size;
+        
+        let listHtml = '<ul style="margin:0; padding-left:20px;">';
+        document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
+            const row = checkbox.closest('.report-row');
+            const productName = row ? row.querySelector('.col-product')?.innerText : 'Unknown';
+            listHtml += `<li>${productName}</li>`;
+        });
+        listHtml += '</ul>';
+        document.getElementById('bulkDeleteList').innerHTML = listHtml;
+        
+        document.getElementById('bulkDeleteModal').style.display = 'flex';
+    }
+    
+    function confirmBulkDelete() {
+        if (selectedReports.size === 0) return;
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "/dashboard/bulk-delete-reports/";
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        
+        const idsInput = document.createElement('input');
+        idsInput.type = 'hidden';
+        idsInput.name = 'report_ids';
+        idsInput.value = JSON.stringify(Array.from(selectedReports));
+        form.appendChild(idsInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    function closeBulkModal() {
+        document.getElementById('bulkDeleteModal').style.display = 'none';
+    }
+    
+    function showDeleteModal(reportId, productName) {
+        deleteReportId = reportId;
+        document.getElementById('deleteProductName').innerText = productName;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        deleteReportId = null;
+    }
+    
+    function confirmDelete() {
+        if (deleteReportId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/delete-report/${deleteReportId}/`;
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    function searchReports() {
+        const filter = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.report-row');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const id = row.querySelector('.col-id')?.innerText.toLowerCase() || '';
+            const userName = row.querySelector('.user-name')?.innerText.toLowerCase() || '';
+            const userEmail = row.querySelector('.user-email')?.innerText.toLowerCase() || '';
+            const product = row.querySelector('.col-product')?.innerText.toLowerCase() || '';
+            const status = row.querySelector('.col-status')?.innerText.toLowerCase() || '';
+            
+            const text = `${id} ${userName} ${userEmail} ${product} ${status}`;
+            
+            if (text.includes(filter)) {
+                row.style.display = 'table-row';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        updateBulkActions();
+        showToast(`Found ${visibleCount} report(s)`, 'success');
+    }
+    
+    function exportToCSV() {
+        try {
+            const allRows = document.querySelectorAll('.report-row');
+            const visibleRows = [];
+            
+            for (let i = 0; i < allRows.length; i++) {
+                const row = allRows[i];
+                const displayStyle = window.getComputedStyle(row).display;
+                if (displayStyle !== 'none') {
+                    visibleRows.push(row);
+                }
+            }
+            
+            if (visibleRows.length === 0) {
+                alert('No data to export!');
+                return;
+            }
+            
+            let csvContent = "Report ID,User Name,User Email,Product Name,Safe Ingredients,Moderate Ingredients,Harmful Ingredients,Overall Status,Analyzed Date\n";
+            
+            for (let i = 0; i < visibleRows.length; i++) {
+                const row = visibleRows[i];
+                
+                const reportId = row.querySelector('.col-id')?.innerText.trim() || '';
+                const userName = row.querySelector('.user-name')?.innerText.trim() || '';
+                const userEmail = row.querySelector('.user-email')?.innerText.trim() || '';
+                let productName = row.querySelector('.col-product')?.innerText.trim() || '';
+                const safeCount = row.querySelector('.col-safe')?.innerText.trim() || '0';
+                const moderateCount = row.querySelector('.col-moderate')?.innerText.trim() || '0';
+                const harmfulCount = row.querySelector('.col-harmful')?.innerText.trim() || '0';
+                
+                let status = row.querySelector('.col-status')?.innerText.trim() || '';
+                status = status.replace('✅', '').replace('⚠️', '').replace('❌', '').trim();
+                
+                const date = row.querySelector('.col-date')?.innerText.trim() || '';
+                
+                if (productName.includes(',')) {
+                    productName = `"${productName}"`;
+                }
+                if (userName.includes(',')) {
+                    userName = `"${userName}"`;
+                }
+                if (userEmail.includes(',')) {
+                    userEmail = `"${userEmail}"`;
+                }
+                
+                csvContent += `${reportId},${userName},${userEmail},${productName},${safeCount},${moderateCount},${harmfulCount},${status},${date}\n`;
+            }
+            
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            link.href = url;
+            link.download = `reports_export_${timestamp}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showToast(`✅ Exported ${visibleRows.length} report(s) successfully!`, 'success');
+            
+        } catch (error) {
+            console.error('Export error:', error);
+            alert('Error exporting CSV: ' + error.message);
+        }
+    }
+    
+    function showToast(message, type) {
+        const existingToasts = document.querySelectorAll('.toast-message');
+        existingToasts.forEach(toast => toast.remove());
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-message toast-${type}`;
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            if (toast && toast.remove) {
+                toast.remove();
+            }
+        }, 3000);
+    }
+    
+    document.getElementById('searchInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            searchReports();
+        }
+    });
+    
+    window.onclick = function(e) {
+        if (e.target.classList.contains('modal')) {
+            closeModal();
+            closeBulkModal();
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateBulkActions();
+    });
+</script>
+{% endblock %}

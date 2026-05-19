@@ -1,0 +1,855 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ========== LUXURY ADMIN DASHBOARD CSS ========== */
+    
+    :root {
+        --admin-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --admin-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --admin-success: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+        --admin-warning: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+        --admin-danger: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        --admin-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        --admin-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --admin-skin: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+        --shadow-sm: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+        --shadow-lg: 0 30px 50px -20px rgba(0, 0, 0, 0.25);
+        --shadow-xl: 0 40px 60px -25px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Admin Container */
+    .luxury-admin {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem 0;
+    }
+    
+    /* Header Section */
+    .admin-header {
+        background: var(--admin-dark);
+        border-radius: 40px;
+        padding: 2.5rem 3rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        top: -40%;
+        right: -10%;
+        width: 60%;
+        height: 180%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .admin-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 50%;
+        height: 150%;
+        background: radial-gradient(circle, rgba(102,126,234,0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .admin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        margin-bottom: 1.2rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.9);
+    }
+    
+    .admin-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #fff 0%, #e0d7ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+    
+    .admin-subtitle {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.7);
+        max-width: 500px;
+    }
+    
+    .admin-header-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .header-stat {
+        text-align: center;
+    }
+    
+    .header-stat-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        display: block;
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .header-stat-label {
+        font-size: 0.75rem;
+        opacity: 0.6;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Stats Grid - 4 Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.8rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 600px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 28px;
+        padding: 1.8rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .stat-card:nth-child(1)::before { background: var(--admin-primary); }
+    .stat-card:nth-child(2)::before { background: var(--admin-success); }
+    .stat-card:nth-child(3)::before { background: var(--admin-warning); }
+    .stat-card:nth-child(4)::before { background: var(--admin-skin); }
+    
+    .stat-card:hover::before { opacity: 1; }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--admin-primary);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1;
+        margin-bottom: 0.3rem;
+    }
+    
+    .stat-card:nth-child(2) .stat-number { background: var(--admin-success); -webkit-background-clip: text; background-clip: text; }
+    .stat-card:nth-child(3) .stat-number { background: var(--admin-warning); -webkit-background-clip: text; background-clip: text; }
+    .stat-card:nth-child(4) .stat-number { background: var(--admin-skin); -webkit-background-clip: text; background-clip: text; }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+    }
+    
+    .stat-trend {
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin-top: 0.5rem;
+    }
+    
+    .trend-up { color: #00b09b; }
+    .trend-down { color: #eb3349; }
+    
+    /* Action Buttons Section */
+    .actions-section {
+        background: white;
+        border-radius: 32px;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.8rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .section-title-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #f5f0ff 0%, #ede8ff 100%);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+    
+    .section-title h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0;
+    }
+    
+    .section-title p {
+        color: #718096;
+        font-size: 0.8rem;
+        margin: 0;
+    }
+    
+    .admin-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.2rem;
+    }
+    
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.2rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .action-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .action-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .action-icon {
+        font-size: 1.6rem;
+    }
+    
+    .action-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .action-title {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+    
+    .action-desc {
+        font-size: 0.7rem;
+        opacity: 0.8;
+    }
+    
+    .action-arrow {
+        font-size: 1.2rem;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .action-btn:hover .action-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    /* Color variations for action buttons */
+    .action-btn:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .action-btn:nth-child(2) { background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); }
+    .action-btn:nth-child(3) { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+    .action-btn:nth-child(4) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .action-btn:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .action-btn:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #1a1a2e; }
+    .action-btn:nth-child(7) { background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%); }
+    
+    /* Recent Activity Section */
+    .recent-section {
+        background: white;
+        border-radius: 32px;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .recent-list {
+        margin-top: 1rem;
+    }
+    
+    .recent-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+    
+    .recent-item:hover {
+        background: linear-gradient(90deg, #f8f9ff 0%, transparent 100%);
+        padding-left: 0.5rem;
+    }
+    
+    .recent-item:last-child {
+        border-bottom: none;
+    }
+    
+    .recent-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .recent-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #f5f0ff 0%, #ede8ff 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .recent-time {
+        font-size: 0.7rem;
+        color: #a0aec0;
+    }
+    
+    .view-all-link {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .view-all-link:hover {
+        color: #764ba2;
+        transform: translateX(3px);
+        display: inline-block;
+    }
+    
+    /* Additional Admin Features */
+    .quick-stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-stat {
+        background: white;
+        border-radius: 20px;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+    
+    .quick-stat:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .quick-stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #667eea;
+    }
+    
+    .quick-stat-label {
+        font-size: 0.7rem;
+        color: #718096;
+    }
+    
+    /* Skin Report Specific Styles */
+    .skin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .skin-badge.excellent { background: #e8f5e9; color: #2e7d32; }
+    .skin-badge.good { background: #e3f2fd; color: #1565c0; }
+    .skin-badge.moderate { background: #fff3e0; color: #e65100; }
+    .skin-badge.avoid { background: #ffebee; color: #c62828; }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .admin-title {
+            font-size: 2rem;
+        }
+        
+        .admin-header {
+            padding: 1.8rem;
+        }
+        
+        .admin-header-stats {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .actions-section,
+        .recent-section {
+            padding: 1.5rem;
+        }
+        
+        .quick-stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes ripple {
+        from {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+        to {
+            transform: translate(-50%, -50%) scale(4);
+            opacity: 0;
+        }
+    }
+    
+    .stat-card {
+        animation: fadeInUp 0.5s ease forwards;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.35s; }
+    
+    .action-btn {
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+    }
+    
+    .action-btn:nth-child(1) { animation-delay: 0.4s; }
+    .action-btn:nth-child(2) { animation-delay: 0.45s; }
+    .action-btn:nth-child(3) { animation-delay: 0.5s; }
+    .action-btn:nth-child(4) { animation-delay: 0.55s; }
+    .action-btn:nth-child(5) { animation-delay: 0.6s; }
+    .action-btn:nth-child(6) { animation-delay: 0.65s; }
+    .action-btn:nth-child(7) { animation-delay: 0.7s; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+</style>
+
+<div class="luxury-admin">
+    <!-- Hero Header -->
+    <div class="admin-header">
+        <div class="admin-badge">
+            <span>🔐</span>
+            <span>ADMINISTRATOR ACCESS</span>
+            <span>✦</span>
+        </div>
+        <h1 class="admin-title">Admin Dashboard</h1>
+        <p class="admin-subtitle">Complete control over users, products, skin analysis & system analytics</p>
+        <div class="admin-header-stats">
+            <div class="header-stat">
+                <span class="header-stat-number">100%</span>
+                <span class="header-stat-label">System Uptime</span>
+            </div>
+            <div class="header-stat">
+                <span class="header-stat-number">24/7</span>
+                <span class="header-stat-label">Monitoring</span>
+            </div>
+            <div class="header-stat">
+                <span class="header-stat-number">Secure</span>
+                <span class="header-stat-label">Encrypted</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="location.href='{% url 'view-users' %}'">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ total_users|default:"0" }}</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-trend">
+                <span class="trend-up">↑ 12%</span>
+                <span>this month</span>
+            </div>
+        </div>
+        
+        <div class="stat-card" onclick="location.href='{% url 'manage-products' %}'">
+            <div class="stat-icon">📦</div>
+            <div class="stat-number">{{ total_products|default:"0" }}</div>
+            <div class="stat-label">Total Products</div>
+            <div class="stat-trend">
+                <span class="trend-up">↑ 8%</span>
+                <span>this month</span>
+            </div>
+        </div>
+        
+        <div class="stat-card" onclick="location.href='{% url 'view-reports' %}'">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number">{{ total_reports|default:"0" }}</div>
+            <div class="stat-label">Total Reports</div>
+            <div class="stat-trend">
+                <span class="trend-up">↑ 23%</span>
+                <span>this week</span>
+            </div>
+        </div>
+        
+        <div class="stat-card" onclick="location.href='{% url 'admin-skin-reports' %}'">
+            <div class="stat-icon">✨</div>
+            <div class="stat-number">{{ total_skin_reports|default:"0" }}</div>
+            <div class="stat-label">Skin Reports</div>
+            <div class="stat-trend">
+                <span class="trend-up">↑ 15%</span>
+                <span>this week</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions Section with Skin Reports Box -->
+    <div class="actions-section">
+        <div class="section-header">
+            <div class="section-title">
+                <div class="section-title-icon">⚡</div>
+                <div>
+                    <h3>Quick Actions</h3>
+                    <p>Manage your platform with one-click access</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-actions">
+            <a href="{% url 'manage-products' %}" class="action-btn">
+                <div class="action-content">
+                    <span class="action-icon">📦</span>
+                    <div class="action-text">
+                        <span class="action-title">Manage Products</span>
+                        <span class="action-desc">Edit, update, or remove products</span>
+                    </div>
+                </div>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{% url 'add-product' %}" class="action-btn">
+                <div class="action-content">
+                    <span class="action-icon">➕</span>
+                    <div class="action-text">
+                        <span class="action-title">Add New Product</span>
+                        <span class="action-desc">Create and publish new products</span>
+                    </div>
+                </div>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{% url 'view-users' %}" class="action-btn">
+                <div class="action-content">
+                    <span class="action-icon">👥</span>
+                    <div class="action-text">
+                        <span class="action-title">View Users</span>
+                        <span class="action-desc">Manage user accounts & permissions</span>
+                    </div>
+                </div>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{% url 'view-reports' %}" class="action-btn">
+                <div class="action-content">
+                    <span class="action-icon">📊</span>
+                    <div class="action-text">
+                        <span class="action-title">View Reports</span>
+                        <span class="action-desc">Analyze system activity & insights</span>
+                    </div>
+                </div>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <!-- Skin Analysis Reports Button -->
+            <a href="{% url 'admin-skin-reports' %}" class="action-btn" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);">
+                <div class="action-content">
+                    <span class="action-icon">✨🧴</span>
+                    <div class="action-text">
+                        <span class="action-title">Skin Analysis Reports</span>
+                        <span class="action-desc">View all skincare product analyses ({{ total_skin_reports|default:"0" }} total)</span>
+                    </div>
+                </div>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{% url 'manage-ingredients' %}" class="action-btn">
+                <div class="action-content">
+                    <span class="action-icon">🌿</span>
+                    <div class="action-text">
+                        <span class="action-title">Manage Ingredients</span>
+                        <span class="action-desc">Add, edit, or remove ingredients</span>
+                    </div>
+                </div>
+                <span class="action-arrow">→</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Quick Stats Row -->
+    <div class="quick-stats-row">
+        <div class="quick-stat">
+            <div class="quick-stat-value">{{ total_ingredients|default:"0" }}</div>
+            <div class="quick-stat-label">Total Ingredients</div>
+        </div>
+        <div class="quick-stat">
+            <div class="quick-stat-value">{{ total_products|default:"0" }}</div>
+            <div class="quick-stat-label">Active Products</div>
+        </div>
+        <div class="quick-stat">
+            <div class="quick-stat-value">{{ total_reports|default:"0" }}</div>
+            <div class="quick-stat-label">Product Analyses</div>
+        </div>
+        <div class="quick-stat">
+            <div class="quick-stat-value">{{ total_skin_reports|default:"0" }}</div>
+            <div class="quick-stat-label">Skin Analyses</div>
+        </div>
+    </div>
+    
+    <!-- Recent Product Reports Section -->
+    {% if recent_reports %}
+    <div class="recent-section">
+        <div class="section-header">
+            <div class="section-title">
+                <div class="section-title-icon">📊</div>
+                <div>
+                    <h3>Recent Product Reports</h3>
+                    <p>Latest product ingredient analyses</p>
+                </div>
+            </div>
+            <a href="{% url 'view-reports' %}" class="view-all-link">View All →</a>
+        </div>
+        <div class="recent-list">
+            {% for report in recent_reports|slice:":5" %}
+            <div class="recent-item">
+                <div class="recent-info">
+                    <div class="recent-avatar">📊</div>
+                    <div>
+                        <div style="font-weight: 500;">
+                            {{ report.user.username }} analyzed "{{ report.product_name }}"
+                        </div>
+                        <div class="recent-time">{{ report.analyzed_at|timesince }} ago</div>
+                    </div>
+                </div>
+                <span class="skin-badge {% if report.overall_status == 'safe' %}excellent{% elif report.overall_status == 'moderate' %}moderate{% else %}avoid{% endif %}">
+                    {{ report.overall_status|upper }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Luxury Admin Dashboard Interactive Features
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✨ Luxury Admin Dashboard Loaded Successfully');
+        console.log('📊 Skin Reports Feature Enabled');
+        
+        // Add ripple effect for stat cards
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.backgroundColor = 'rgba(102,126,234,0.4)';
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.left = e.offsetX + 'px';
+                ripple.style.top = e.offsetY + 'px';
+                ripple.style.zIndex = '10';
+                
+                card.style.position = 'relative';
+                card.style.overflow = 'hidden';
+                card.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+        
+        // Add smooth number counting animation
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            const finalValue = parseInt(stat.innerText);
+            if (!isNaN(finalValue)) {
+                let currentValue = 0;
+                const increment = finalValue / 50;
+                const updateNumber = () => {
+                    currentValue += increment;
+                    if (currentValue < finalValue) {
+                        stat.innerText = Math.floor(currentValue);
+                        requestAnimationFrame(updateNumber);
+                    } else {
+                        stat.innerText = finalValue;
+                    }
+                };
+                updateNumber();
+            }
+        });
+        
+        // Add hover effect for action buttons
+        const actionBtns = document.querySelectorAll('.action-btn');
+        actionBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+            });
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Quick stats counting animation
+        const quickStats = document.querySelectorAll('.quick-stat-value');
+        quickStats.forEach(stat => {
+            const finalValue = parseInt(stat.innerText);
+            if (!isNaN(finalValue)) {
+                let currentValue = 0;
+                const increment = finalValue / 40;
+                const updateNumber = () => {
+                    currentValue += increment;
+                    if (currentValue < finalValue) {
+                        stat.innerText = Math.floor(currentValue);
+                        requestAnimationFrame(updateNumber);
+                    } else {
+                        stat.innerText = finalValue;
+                    }
+                };
+                updateNumber();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

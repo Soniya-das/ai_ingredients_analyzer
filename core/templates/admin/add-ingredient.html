@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Ingredient | Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container {
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .admin-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .admin-header h2 {
+        margin: 0;
+        color: #1A1A1A;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #27AE60, #1E8449);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+    }
+    
+    .btn-cancel {
+        background: #95A5A6;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-left: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: #7F8C8D;
+    }
+    
+    .error-message {
+        color: #E74C3C;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #666;
+        text-decoration: none;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h2>➕ Add New Ingredient</h2>
+        <p>Add a new ingredient to the database for safety analysis</p>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_name">Ingredient Name *</label>
+            <input type="text" name="name" id="id_name" class="form-control" required>
+            {% if form.name.errors %}
+                <div class="error-message">{{ form.name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="id_category">Category *</label>
+            <select name="category" id="id_category" required>
+                <option value="safe">✅ Safe</option>
+                <option value="moderate">⚠️ Moderate</option>
+                <option value="harmful">❌ Harmful</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_description">Description</label>
+            <textarea name="description" id="id_description" rows="3" placeholder="Describe the ingredient..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_side_effects">Side Effects</label>
+            <textarea name="side_effects" id="id_side_effects" rows="2" placeholder="List potential side effects..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_suitable_for">Suitable For</label>
+            <input type="text" name="suitable_for" id="id_suitable_for" placeholder="e.g., All skin types, Oily skin, etc.">
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn-save">💾 Save Ingredient</button>
+            <a href="{% url 'manage-ingredients' %}" class="btn-cancel">Cancel</a>
+        </div>
+    </form>
+    
+    <a href="{% url 'manage-ingredients' %}" class="back-link">← Back to Ingredients List</a>
+</div>
+{% endblock %}

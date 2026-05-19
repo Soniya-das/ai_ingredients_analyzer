@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .filtered-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .filter-header {
+        background: linear-gradient(135deg, {{ status_info.color }}, {{ status_info.color }}dd);
+        border-radius: 30px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .filter-header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid {{ status_info.color }};
+        position: relative;
+    }
+    
+    .product-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .product-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        flex: 1;
+    }
+    
+    .product-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: #718096;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .ingredient-list {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .ingredient-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .badge-safe { background: #d4edda; color: #155724; }
+    .badge-moderate { background: #fff3cd; color: #856404; }
+    .badge-harmful { background: #f8d7da; color: #721c24; }
+    
+    .back-btn {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.75rem 1.5rem;
+        background: #718096;
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background: #4a5568;
+        transform: translateX(-3px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        background: #f7fafc;
+        border-radius: 20px;
+    }
+    
+    .count-badge {
+        display: inline-block;
+        background: {{ status_info.color }};
+        color: white;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+    }
+    
+    /* Delete button styles */
+    .delete-icon {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: rgba(239, 68, 68, 0.1);
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #ef4444;
+        transition: all 0.2s ease;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+    
+    .delete-icon:hover {
+        background: #ef4444;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    
+    .product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-right: 3rem;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-safe { background: #d4edda; color: #155724; }
+    .status-moderate { background: #fff3cd; color: #856404; }
+    .status-harmful { background: #f8d7da; color: #721c24; }
+    
+    /* Confirmation Toast */
+    .toast-notification {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #333;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    /* Card delete animation */
+    .card-deleting {
+        opacity: 0;
+        transform: translateX(100px);
+        transition: all 0.3s ease;
+    }
+    
+    .clickable-area {
+        cursor: pointer;
+    }
+</style>
+
+<div class="filtered-container">
+    <div class="filter-header">
+        <h2>{{ status_info.icon }} {{ status_info.name }}</h2>
+        <p>Products containing {{ status_info.name|lower }} ingredients</p>
+        <div class="count-badge" id="productCount">{{ total_count }} product{% if total_count != 1 %}s{% endif %}</div>
+    </div>
+    
+    {% if products %}
+        <div id="productsList">
+            {% for product in products %}
+            <div class="product-card" data-report-id="{{ product.report_id }}">
+                <div class="product-header">
+                    <div class="product-name clickable-area" data-url="{% url 'report' product.report_id %}">
+                        📦 {{ product.product_name }}
+                    </div>
+                    <button class="delete-icon" onclick="event.stopPropagation(); deleteReport({{ product.report_id }}, '{{ product.product_name|escapejs }}')" title="Delete this report">
+                        🗑️
+                    </button>
+                </div>
+                <div class="product-meta clickable-area" data-url="{% url 'report' product.report_id %}">
+                    <span>📅 {{ product.report_date|date:"F j, Y" }}</span>
+                    <span>🔍 {{ product.ingredient_count }} {{ status_info.name|lower }} ingredient{% if product.ingredient_count != 1 %}s{% endif %}</span>
+                    <span class="status-badge status-{{ product.overall_status }}">
+                        Overall: {% if product.overall_status == 'safe' %}✅ SAFE
+                        {% elif product.overall_status == 'moderate' %}⚠️ MODERATE
+                        {% else %}❌ HARMFUL{% endif %}
+                    </span>
+                </div>
+                <div class="ingredient-list clickable-area" data-url="{% url 'report' product.report_id %}">
+                    <strong>🔬 {{ status_info.name }} Ingredients:</strong><br>
+                    {% for ingredient in product.ingredients %}
+                    <span class="ingredient-badge badge-{{ ingredient.status }}">
+                        {{ ingredient.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+            <h3>No {{ status_info.name|lower }} products found</h3>
+            <p>You haven't analyzed any products with {{ status_info.name|lower }} ingredients yet.</p>
+            <a href="{% url 'analyzer' %}" class="back-btn" style="margin-top: 1rem;">🚀 Analyze a Product</a>
+        </div>
+    {% endif %}
+    
+    <a href="{% url 'report-history' %}" class="back-btn">← Back to Report History</a>
+</div>
+
+<script>
+    // Get CSRF token from cookie
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, 10) === 'csrftoken=') {
+                    cookieValue = decodeURIComponent(cookie.substring(10));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Delete report function
+    function deleteReport(reportId, productName) {
+        event.stopPropagation();
+        
+        if (confirm(`🗑️ Delete report for "${productName}"?\n\nThis will remove it from your history.`)) {
+            const card = document.querySelector(`.product-card[data-report-id="${reportId}"]`);
+            
+            fetch(`/delete-report/${reportId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Animate card removal
+                    if (card) {
+                        card.classList.add('card-deleting');
+                        setTimeout(() => {
+                            card.remove();
+                            updateProductCount();
+                            showToast(`✅ "${productName}" removed from history`, 'success');
+                            
+                            // Check if no products left
+                            const remainingCards = document.querySelectorAll('.product-card').length;
+                            if (remainingCards === 0) {
+                                location.reload();
+                            }
+                        }, 300);
+                    } else {
+                        showToast(`✅ "${productName}" removed from history`, 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                } else {
+                    showToast(`❌ Failed to delete: ${data.message || 'Unknown error'}`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('❌ An error occurred while deleting', 'error');
+            });
+        }
+    }
+    
+    // Update product count in header
+    function updateProductCount() {
+        const remainingCards = document.querySelectorAll('.product-card').length;
+        const countBadge = document.getElementById('productCount');
+        if (countBadge) {
+            if (remainingCards === 0) {
+                countBadge.textContent = '0 products';
+            } else {
+                countBadge.textContent = `${remainingCards} product${remainingCards !== 1 ? 's' : ''}`;
+            }
+        }
+    }
+    
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    // Make clickable areas redirect to report detail
+    document.querySelectorAll('.clickable-area').forEach(element => {
+        element.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const url = this.getAttribute('data-url');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+    
+    // Prevent delete button click from triggering card click
+    document.querySelectorAll('.delete-icon').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
+</script>
+{% endblock %}

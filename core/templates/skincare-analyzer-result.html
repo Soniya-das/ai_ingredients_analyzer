@@ -1,0 +1,1136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analysis Results | AI Smart Care{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --luxury-gold: #D4AF37;
+        --luxury-gold-light: #F3E5AB;
+        --luxury-black: #1A1A1A;
+        --luxury-dark: #2C2C2C;
+        --success: #27AE60;
+        --warning: #F39C12;
+        --danger: #E74C3C;
+        --excellent: #00B894;
+        --good: #3498DB;
+    }
+
+    /* ======================================== */
+    /* INGREDIENT ROW COLORS - RED, ORANGE, GREEN */
+    /* ======================================== */
+    
+    .ingredient-row {
+        transition: all 0.3s ease;
+    }
+    
+    /* HARMFUL - RED Color */
+    .ingredient-row.status-harmful-row {
+        background: rgba(231, 76, 60, 0.08);
+        border-left: 4px solid #E74C3C;
+    }
+    
+    .ingredient-row.status-harmful-row:hover {
+        background: rgba(231, 76, 60, 0.15);
+    }
+    
+    /* MODERATE - ORANGE Color */
+    .ingredient-row.status-moderate-row {
+        background: rgba(243, 156, 18, 0.08);
+        border-left: 4px solid #F39C12;
+    }
+    
+    .ingredient-row.status-moderate-row:hover {
+        background: rgba(243, 156, 18, 0.15);
+    }
+    
+    /* SAFE - GREEN Color */
+    .ingredient-row.status-safe-row {
+        background: rgba(39, 174, 96, 0.08);
+        border-left: 4px solid #27AE60;
+    }
+    
+    .ingredient-row.status-safe-row:hover {
+        background: rgba(39, 174, 96, 0.15);
+    }
+    
+    /* Status Badge Styles */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .status-badge.status-harmful {
+        background: rgba(231, 76, 60, 0.15);
+        color: #E74C3C;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+    
+    .status-badge.status-moderate {
+        background: rgba(243, 156, 18, 0.15);
+        color: #F39C12;
+        border: 1px solid rgba(243, 156, 18, 0.3);
+    }
+    
+    .status-badge.status-safe {
+        background: rgba(39, 174, 96, 0.15);
+        color: #27AE60;
+        border: 1px solid rgba(39, 174, 96, 0.3);
+    }
+    
+    /* Compatibility Bar Colors */
+    .compatibility-fill.fill-avoid {
+        background: #E74C3C;
+    }
+    
+    .compatibility-fill.fill-caution {
+        background: #F39C12;
+    }
+    
+    .compatibility-fill.fill-good {
+        background: #3498DB;
+    }
+    
+    .compatibility-fill.fill-excellent {
+        background: #27AE60;
+    }
+    
+    /* Scientific Badge */
+    .scientific-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--luxury-gold), #B8962E);
+        color: var(--luxury-black);
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+    
+    /* Compatibility Bar */
+    .compatibility-bar {
+        width: 100px;
+        height: 6px;
+        background: #F0F0F0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .compatibility-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+    }
+    
+    /* Clickable Ingredient */
+    .clickable-ingredient {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-weight: 500;
+    }
+    
+    .clickable-ingredient:hover {
+        color: var(--luxury-gold);
+        text-decoration: underline;
+    }
+    
+    /* Result Container */
+    .result-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    /* Score Header */
+    .score-header {
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-dark) 100%);
+        border-radius: 32px;
+        padding: 50px;
+        margin-bottom: 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .score-circle {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 30px;
+        position: relative;
+    }
+    
+    .score-circle svg {
+        transform: rotate(-90deg);
+    }
+    
+    .score-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--luxury-gold);
+    }
+    
+    .score-label {
+        font-size: 14px;
+        color: rgba(255,255,255,0.7);
+        margin-top: 10px;
+    }
+    
+    .product-name {
+        font-size: 32px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 10px;
+    }
+    
+    .verdict-badge {
+        display: inline-block;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+    
+    .verdict-excellent {
+        background: var(--excellent);
+        color: white;
+    }
+    
+    .verdict-good {
+        background: var(--good);
+        color: white;
+    }
+    
+    .verdict-moderate {
+        background: var(--warning);
+        color: white;
+    }
+    
+    .verdict-avoid {
+        background: var(--danger);
+        color: white;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-value {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .stat-safe { color: var(--success); }
+    .stat-moderate { color: var(--warning); }
+    .stat-harmful { color: var(--danger); }
+    
+    /* Ingredients Section */
+    .ingredients-section {
+        background: white;
+        border-radius: 32px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--luxury-black);
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #F0F0F0;
+    }
+    
+    .ingredient-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .ingredient-table th {
+        text-align: left;
+        padding: 15px;
+        background: #F8F8F8;
+        font-weight: 600;
+        color: var(--luxury-black);
+    }
+    
+    .ingredient-table td {
+        padding: 15px;
+        border-bottom: 1px solid #F0F0F0;
+        vertical-align: top;
+    }
+    
+    /* Recommendations Section */
+    .recommendations-section {
+        background: white;
+        border-radius: 32px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    
+    .rec-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #F0F0F0;
+    }
+    
+    .rec-header-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .rec-header h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--luxury-black);
+        margin: 0;
+    }
+    
+    .rec-header p {
+        font-size: 13px;
+        color: #888;
+        margin: 4px 0 0;
+    }
+    
+    /* Summary Card */
+    .summary-card {
+        background: linear-gradient(135deg, #F8F9FA, #F1F3F5);
+        border-radius: 20px;
+        padding: 24px 28px;
+        margin-bottom: 28px;
+        border-left: 4px solid var(--luxury-gold);
+    }
+    
+    .summary-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--luxury-gold);
+        color: var(--luxury-black);
+        padding: 5px 14px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        letter-spacing: 0.5px;
+    }
+    
+    .summary-text {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #444;
+        margin: 0;
+        white-space: pre-line;
+    }
+    
+    /* Score Breakdown */
+    .score-breakdown {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+    
+    .score-item {
+        flex: 1;
+        background: #F8F9FA;
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .score-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    .score-item-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--luxury-gold);
+        margin-bottom: 6px;
+    }
+    
+    .score-item-label {
+        font-size: 11px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .score-item-bar {
+        width: 100%;
+        height: 4px;
+        background: #E9ECEF;
+        border-radius: 2px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+    
+    .score-item-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        background: var(--luxury-gold);
+        width: 0%;
+        transition: width 0.5s ease;
+    }
+    
+    /* Key Insights */
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+    
+    .insight-card {
+        background: #F8F9FA;
+        border-radius: 18px;
+        padding: 18px;
+    }
+    
+    .insight-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--luxury-black);
+        margin-bottom: 12px;
+    }
+    
+    .insight-title span {
+        font-size: 18px;
+    }
+    
+    .insight-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .insight-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #555;
+        padding: 8px 0;
+        border-bottom: 1px solid #E9ECEF;
+    }
+    
+    .insight-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .insight-bullet {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--luxury-gold);
+    }
+    
+    .insight-bullet-safe { background: var(--success); }
+    .insight-bullet-caution { background: var(--warning); }
+    .insight-bullet-avoid { background: var(--danger); }
+    
+    /* Skin Advice Card */
+    .skin-advice-card {
+        background: linear-gradient(135deg, rgba(212,175,55,0.06), rgba(212,175,55,0.02));
+        border-radius: 20px;
+        padding: 24px 28px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(212,175,55,0.12);
+    }
+    
+    .skin-advice-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    
+    .skin-advice-header span {
+        font-size: 24px;
+    }
+    
+    .skin-advice-header strong {
+        font-size: 16px;
+        color: var(--luxury-black);
+    }
+    
+    .skin-advice-text {
+        font-size: 13px;
+        line-height: 1.7;
+        color: #555;
+        margin: 0;
+        white-space: pre-line;
+        background: #FAFAFA;
+        padding: 16px;
+        border-radius: 12px;
+    }
+    
+    /* Compatibility Score Box */
+    .compatibility-score-box {
+        margin-top: 20px;
+        background: #FFF8E7;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid rgba(212,175,55,0.3);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 14px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--luxury-gold), #B8962E);
+        color: var(--luxury-black);
+    }
+    
+    .btn-secondary {
+        background: var(--luxury-dark);
+        color: white;
+    }
+    
+    .btn-primary:hover, .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .modal-content {
+        background: white;
+        margin: 5% auto;
+        max-width: 600px;
+        width: 90%;
+        border-radius: 28px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        animation: slideUp 0.3s ease;
+        overflow: hidden;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--luxury-black), var(--luxury-dark));
+        padding: 24px 28px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+    }
+    
+    .modal-close {
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+        background: rgba(255,255,255,0.2);
+        transform: rotate(90deg);
+    }
+    
+    .modal-body {
+        padding: 28px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    
+    .detail-section {
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #F0F0F0;
+    }
+    
+    .detail-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .detail-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    
+    .detail-value {
+        font-size: 14px;
+        color: #333;
+        line-height: 1.6;
+    }
+    
+    .detail-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .detail-badge-safe {
+        background: rgba(39,174,96,0.1);
+        color: var(--success);
+    }
+    
+    .detail-badge-moderate {
+        background: rgba(243,156,18,0.1);
+        color: var(--warning);
+    }
+    
+    .detail-badge-harmful {
+        background: rgba(231,76,60,0.1);
+        color: var(--danger);
+    }
+    
+    .scientific-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--luxury-gold);
+        margin-top: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        .score-header {
+            padding: 30px;
+        }
+        .ingredients-section {
+            padding: 25px;
+            overflow-x: auto;
+        }
+        .ingredient-table {
+            min-width: 600px;
+        }
+        .insights-grid {
+            grid-template-columns: 1fr;
+        }
+        .score-breakdown {
+            flex-direction: column;
+        }
+        .modal-content {
+            margin: 15% auto;
+            width: 95%;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+        }
+    }
+</style>
+
+<div class="result-container">
+    <!-- Score Header -->
+    <div class="score-header">
+        <div class="score-circle">
+            <svg width="180" height="180">
+                <circle cx="90" cy="90" r="80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                <circle cx="90" cy="90" r="80" fill="none" stroke="var(--luxury-gold)" 
+                        stroke-width="12" stroke-dasharray="502" 
+                        stroke-dashoffset="{{ result.overall_score|default:0|add:-100|floatformat:0|default:0 }}"
+                        style="transition: stroke-dashoffset 1s ease;"/>
+            </svg>
+            <div class="score-value">{{ result.overall_score }}/100</div>
+        </div>
+        <div class="product-name">{{ product_name }}</div>
+        <div class="score-label">Overall Product Score</div>
+        <div class="verdict-badge verdict-{{ result.overall_verdict }}">
+            {% if result.overall_verdict == 'excellent' %}🌟 EXCELLENT CHOICE
+            {% elif result.overall_verdict == 'good' %}✅ GOOD CHOICE
+            {% elif result.overall_verdict == 'moderate' %}⚠️ USE WITH CAUTION
+            {% else %}❌ AVOID THIS PRODUCT
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value stat-safe">{{ result.safe_count }}</div>
+            <div class="stat-label">✅ Safe Ingredients</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value stat-moderate">{{ result.moderate_count }}</div>
+            <div class="stat-label">⚠️ Moderate Risk</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value stat-harmful">{{ result.harmful_count }}</div>
+            <div class="stat-label">❌ Harmful Ingredients</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ result.scientifically_approved_count }}</div>
+            <div class="stat-label">🔬 Scientifically Approved</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ result.dermatologist_recommended_count }}</div>
+            <div class="stat-label">👨‍⚕️ Derm-Recommended</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value {% if result.skin_compatibility_score <= 20 %}stat-harmful{% elif result.skin_compatibility_score <= 60 %}stat-moderate{% else %}stat-safe{% endif %}">
+                {{ result.skin_compatibility_score }}/100
+            </div>
+            <div class="stat-label">🎯 Skin Compatibility</div>
+        </div>
+    </div>
+
+    <!-- Ingredients Analysis - Clickable Rows with Color Coding -->
+    <div class="ingredients-section">
+        <h2 class="section-title">🔬 Detailed Ingredient Analysis</h2>
+        <table class="ingredient-table">
+            <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Status</th>
+                    <th>Skin Compatibility</th>
+                    <th>Scientific Approval</th>
+                    <th>Dermatologist Insight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ingredient in result.ingredients %}
+                <tr class="ingredient-row status-{{ ingredient.status }}-row" data-ingredient='{{ ingredient|escapejs }}' onclick="showIngredientDetails(this)">
+                    <td style="font-weight: 500;">
+                        <span class="clickable-ingredient">
+                            {{ ingredient.name }}
+                            {% if ingredient.scientific_approval.has_approval %}
+                                <span class="scientific-badge">✓ Clinically Proven</span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ ingredient.status }}">
+                            {% if ingredient.status == 'harmful' %}❌{% elif ingredient.status == 'moderate' %}⚠️{% else %}✅{% endif %}
+                            {{ ingredient.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 12px; {% if ingredient.status == 'harmful' %}color: #E74C3C; font-weight: bold;{% elif ingredient.status == 'moderate' %}color: #F39C12;{% else %}color: #27AE60;{% endif %}">
+                                {{ ingredient.skin_compatibility }}%
+                            </span>
+                            <div class="compatibility-bar">
+                                <div class="compatibility-fill 
+                                    {% if ingredient.status == 'safe' and ingredient.skin_compatibility >= 80 %}fill-excellent
+                                    {% elif ingredient.status == 'safe' %}fill-good
+                                    {% elif ingredient.status == 'moderate' %}fill-caution
+                                    {% else %}fill-avoid{% endif %}"
+                                    style="width: {{ ingredient.skin_compatibility }}%;">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size: 13px;">
+                        {% if ingredient.scientific_approval.has_approval %}
+                            {{ ingredient.scientific_approval.level }}
+                            {% if ingredient.scientific_approval.certifying_body %}
+                                <br><small>{{ ingredient.scientific_approval.certifying_body }}</small>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #999;">Not Approved</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size: 13px;">
+                        {% if ingredient.dermatologist_suggestions %}
+                            {% for suggestion in ingredient.dermatologist_suggestions|slice:":1" %}
+                                <strong>{{ suggestion.type|title }}:</strong> {{ suggestion.text|truncatewords:10 }}
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: #999;">No specific data</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Professional Recommendations Section -->
+    <div class="recommendations-section">
+        <div class="rec-header">
+            <div class="rec-header-icon">📋</div>
+            <div>
+                <h2>Professional Recommendations</h2>
+                <p>Evidence-based analysis by dermatology experts</p>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card">
+            <div class="summary-label">
+                📝 CLINICAL SUMMARY
+            </div>
+            <p class="summary-text">
+                {{ result.recommendation_summary|default:"No recommendation available" }}
+            </p>
+        </div>
+
+        <!-- Score Breakdown -->
+        <div class="score-breakdown">
+            <div class="score-item">
+                <div class="score-item-value {% if result.safety_score <= 20 %}stat-harmful{% elif result.safety_score <= 60 %}stat-moderate{% else %}stat-safe{% endif %}">
+                    {{ result.safety_score|default:0 }}%
+                </div>
+                <div class="score-item-label">Safety Score</div>
+                <div class="score-item-bar">
+                    <div class="score-item-bar-fill" style="width: {{ result.safety_score|default:0 }}%; background: {% if result.safety_score <= 20 %}#E74C3C{% elif result.safety_score <= 60 %}#F39C12{% else %}#27AE60{% endif %};"></div>
+                </div>
+            </div>
+            <div class="score-item">
+                <div class="score-item-value">{{ result.efficacy_score|default:0 }}%</div>
+                <div class="score-item-label">Efficacy Score</div>
+                <div class="score-item-bar">
+                    <div class="score-item-bar-fill" style="width: {{ result.efficacy_score|default:0 }}%"></div>
+                </div>
+            </div>
+            <div class="score-item">
+                <div class="score-item-value {% if result.skin_compatibility_score <= 20 %}stat-harmful{% elif result.skin_compatibility_score <= 60 %}stat-moderate{% else %}stat-safe{% endif %}">
+                    {{ result.skin_compatibility_score|default:0 }}%
+                </div>
+                <div class="score-item-label">Compatibility Score</div>
+                <div class="score-item-bar">
+                    <div class="score-item-bar-fill" style="width: {{ result.skin_compatibility_score|default:0 }}%; background: {% if result.skin_compatibility_score <= 20 %}#E74C3C{% elif result.skin_compatibility_score <= 60 %}#F39C12{% else %}#27AE60{% endif %};"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-title">
+                    <span>✅</span> Strengths
+                </div>
+                <ul class="insight-list">
+                    {% if result.safe_count > 0 %}
+                    <li><span class="insight-bullet insight-bullet-safe"></span> {{ result.safe_count }} safe ingredients identified</li>
+                    {% endif %}
+                    {% if result.scientifically_approved_count > 0 %}
+                    <li><span class="insight-bullet insight-bullet-safe"></span> {{ result.scientifically_approved_count }} clinically proven ingredients</li>
+                    {% endif %}
+                    {% if result.dermatologist_recommended_count > 0 %}
+                    <li><span class="insight-bullet insight-bullet-safe"></span> {{ result.dermatologist_recommended_count }} derm-recommended ingredients</li>
+                    {% endif %}
+                    {% if result.skin_compatibility_score >= 70 %}
+                    <li><span class="insight-bullet insight-bullet-safe"></span> High skin compatibility score</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="insight-card">
+                <div class="insight-title">
+                    <span>⚠️</span> Areas of Concern
+                </div>
+                <ul class="insight-list">
+                    {% if result.harmful_count > 0 %}
+                    <li><span class="insight-bullet insight-bullet-avoid"></span> {{ result.harmful_count }} harmful ingredients present</li>
+                    {% endif %}
+                    {% if result.moderate_count > 0 %}
+                    <li><span class="insight-bullet insight-bullet-caution"></span> {{ result.moderate_count }} moderate-risk ingredients</li>
+                    {% endif %}
+                    {% if result.skin_compatibility_score < 50 %}
+                    <li><span class="insight-bullet insight-bullet-caution"></span> Low skin compatibility for your type</li>
+                    {% endif %}
+                    {% if result.harmful_count == 0 and result.moderate_count == 0 %}
+                    <li><span class="insight-bullet insight-bullet-safe"></span> No significant concerns identified</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Personalized Skin Advice -->
+        <div class="skin-advice-card">
+            <div class="skin-advice-header">
+                <span>🎯</span>
+                <strong>Personalized Professional Analysis for Your Skin Type</strong>
+            </div>
+            <div class="skin-advice-text">
+                {{ result.skin_specific_advice|default:"No specific advice available"|linebreaksbr }}
+            </div>
+        </div>
+
+        <!-- Compatibility Score Box -->
+        <div class="compatibility-score-box">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                <span style="font-size: 28px;">📊</span>
+                <div>
+                    <strong style="font-size: 16px; color: #1A1A1A;">Skin Compatibility Score</strong>
+                    <p style="font-size: 12px; color: #666; margin: 0;">Based on your skin type analysis</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <div style="flex: 1;">
+                    <div style="font-size: 48px; font-weight: 800; color: {% if result.skin_compatibility_score <= 20 %}#E74C3C{% elif result.skin_compatibility_score <= 60 %}#F39C12{% else %}#D4AF37{% endif %};">
+                        {{ result.skin_compatibility_score|default:0 }}%
+                    </div>
+                    <div style="font-size: 12px; color: #666;">
+                        {% if result.skin_compatibility_score >= 80 %}
+                            🌟 Excellent match for your skin!
+                        {% elif result.skin_compatibility_score >= 60 %}
+                            ✅ Good compatibility
+                        {% elif result.skin_compatibility_score >= 40 %}
+                            ⚠️ Moderate - Patch test recommended
+                        {% else %}
+                            ❌ Low compatibility - Consider alternatives
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="flex: 2;">
+                    <div class="compatibility-bar" style="width: 100%; height: 12px; border-radius: 6px;">
+                        <div class="compatibility-fill 
+                            {% if result.skin_compatibility_score >= 80 %}fill-excellent
+                            {% elif result.skin_compatibility_score >= 60 %}fill-good
+                            {% elif result.skin_compatibility_score >= 40 %}fill-caution
+                            {% else %}fill-avoid{% endif %}"
+                            style="width: {{ result.skin_compatibility_score|default:0 }}%;">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                        <span style="font-size: 11px;">Not Compatible</span>
+                        <span style="font-size: 11px;">Highly Compatible</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{% url 'skincare-analyzer' %}" class="btn-secondary">
+            🔄 Analyze Another Product
+        </a>
+        <a href="{% url 'skin-report-detail' report_id %}" class="btn-primary">
+            📄 View Full Report →
+        </a>
+    </div>
+</div>
+
+<script>
+    // Animate score on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const score = {{ result.overall_score }};
+        const circumference = 2 * Math.PI * 80;
+        const offset = circumference - (score / 100) * circumference;
+        const circle = document.querySelector('.score-circle svg circle:last-child');
+        if (circle) {
+            circle.style.strokeDashoffset = offset;
+        }
+    });
+
+    // Show ingredient details in modal
+    function showIngredientDetails(row) {
+        let ingredientDataStr = row.getAttribute('data-ingredient');
+        if (!ingredientDataStr) return;
+        
+        try {
+            ingredientDataStr = ingredientDataStr.replace(/&#39;/g, '"');
+            ingredientDataStr = ingredientDataStr.replace(/None/g, 'null');
+            ingredientDataStr = ingredientDataStr.replace(/True/g, 'true');
+            ingredientDataStr = ingredientDataStr.replace(/False/g, 'false');
+            
+            const ingredient = JSON.parse(ingredientDataStr);
+            
+            const statusClass = ingredient.status === 'safe' ? 'detail-badge-safe' : 
+                               (ingredient.status === 'moderate' ? 'detail-badge-moderate' : 'detail-badge-harmful');
+            
+            const scientificHtml = ingredient.scientific_approval && ingredient.scientific_approval.has_approval ? 
+                `<div class="detail-section">
+                    <div class="detail-label">🔬 Scientific Approval</div>
+                    <div class="detail-value">
+                        <strong>${ingredient.scientific_approval.level || 'Not Available'}</strong>
+                        ${ingredient.scientific_approval.certifying_body ? 
+                            `<br><small style="color:#888;">${ingredient.scientific_approval.certifying_body}</small>` : ''}
+                        ${ingredient.scientific_approval.is_clinical ? 
+                            '<div class="scientific-tag">✓ Peer-reviewed Clinical Study</div>' : ''}
+                    </div>
+                </div>` : '';
+            
+            const dermHtml = ingredient.dermatologist_suggestions && ingredient.dermatologist_suggestions.length > 0 ?
+                `<div class="detail-section">
+                    <div class="detail-label">👨‍⚕️ Dermatologist Insight</div>
+                    <div class="detail-value">
+                        ${ingredient.dermatologist_suggestions.map(s => 
+                            `<div style="margin-bottom: 12px;">
+                                <strong style="color:var(--luxury-gold);">${s.type.toUpperCase()}:</strong>
+                                <p style="margin:5px 0 0; color:#555;">${s.text}</p>
+                                <small style="color:#999;">— ${s.dermatologist}</small>
+                            </div>`
+                        ).join('')}
+                    </div>
+                </div>` : '';
+            
+            const skinRecHtml = ingredient.skin_recommendation ?
+                `<div class="detail-section">
+                    <div class="detail-label">🎯 Skin Type Recommendation</div>
+                    <div class="detail-value">
+                        <strong>Compatibility Score: ${ingredient.skin_recommendation.score || 50}%</strong>
+                        <p style="margin:8px 0 0; color:#555;">${ingredient.skin_recommendation.text || 'No specific data'}</p>
+                    </div>
+                </div>` : '';
+            
+            const modalHtml = `
+                <div class="detail-section">
+                    <div class="detail-label">📌 Safety Status</div>
+                    <div class="detail-value">
+                        <span class="detail-badge ${statusClass}">
+                            ${ingredient.status_icon || '📊'} ${ingredient.status.toUpperCase()}
+                        </span>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">💧 Skin Compatibility</div>
+                    <div class="detail-value">
+                        <strong>${ingredient.skin_compatibility || 50}%</strong> - ${ingredient.skin_compatibility_label || 'Average'}
+                        <div class="compatibility-bar" style="margin-top:8px; width:100%;">
+                            <div class="compatibility-fill" style="width: ${ingredient.skin_compatibility || 50}%; background: 
+                                ${(ingredient.skin_compatibility || 50) >= 80 ? '#27AE60' : 
+                                  (ingredient.skin_compatibility || 50) >= 60 ? '#3498DB' : 
+                                  (ingredient.skin_compatibility || 50) >= 40 ? '#F39C12' : '#E74C3C'}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${scientificHtml}
+                ${dermHtml}
+                ${skinRecHtml}
+                ${ingredient.description ? `
+                <div class="detail-section">
+                    <div class="detail-label">ℹ️ Description</div>
+                    <div class="detail-value">${ingredient.description}</div>
+                </div>` : ''}
+                ${ingredient.side_effects ? `
+                <div class="detail-section">
+                    <div class="detail-label">⚠️ Potential Side Effects</div>
+                    <div class="detail-value">${ingredient.side_effects}</div>
+                </div>` : ''}
+            `;
+            
+            document.getElementById('modalIngredientName').innerHTML = ingredient.name;
+            document.getElementById('modalBody').innerHTML = modalHtml;
+            document.getElementById('ingredientModal').style.display = 'block';
+            
+        } catch(e) {
+            console.error('Error parsing ingredient data:', e);
+            document.getElementById('modalIngredientName').innerHTML = 'Ingredient Details';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-label">📌 Information</div>
+                    <div class="detail-value">Unable to load full details. Please try again.</div>
+                </div>
+            `;
+            document.getElementById('ingredientModal').style.display = 'block';
+        }
+    }
+    
+    // Close modal
+    function closeModal() {
+        document.getElementById('ingredientModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('ingredientModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

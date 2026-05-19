@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .admin-container {
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1rem;
+        border-radius: 15px;
+        text-align: center;
+    }
+    
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .report-table th,
+    .report-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .report-table th {
+        background: #f7fafc;
+        font-weight: bold;
+        color: #2d3748;
+    }
+    
+    .badge-safe { background: #48bb78; color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; }
+    .badge-moderate { background: #ed8936; color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; }
+    .badge-harmful { background: #f56565; color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; }
+    
+    .delete-btn {
+        background: #f56565;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+    
+    .delete-btn:hover { background: #e53e3e; }
+</style>
+
+<div class="admin-container">
+    <h2>📋 Admin - All User Reports</h2>
+    <p>Complete analysis reports from all users</p>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_reports }}</div>
+            <div>Total Reports</div>
+        </div>
+        <div class="stat-card" style="background: #48bb78;">
+            <div class="stat-number">{{ safe_count }}</div>
+            <div>✅ Safe Reports</div>
+        </div>
+        <div class="stat-card" style="background: #ed8936;">
+            <div class="stat-number">{{ moderate_count }}</div>
+            <div>⚠️ Moderate Reports</div>
+        </div>
+        <div class="stat-card" style="background: #f56565;">
+            <div class="stat-number">{{ harmful_count }}</div>
+            <div>❌ Harmful Reports</div>
+        </div>
+    </div>
+    
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Product</th>
+                <th>Safe</th>
+                <th>Moderate</th>
+                <th>Harmful</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>#{{ report.id }}</td>
+                <td>{{ report.user.username }}</td>
+                <td>{{ report.product.name }}</td>
+                <td>{{ report.safe_ingredients }}</td>
+                <td>{{ report.moderate_ingredients }}</td>
+                <td>{{ report.harmful_ingredients }}</td>
+                <td>
+                    <span class="badge-{{ report.overall_status }}">
+                        {{ report.overall_status|upper }}
+                    </span>
+                </td>
+                <td>{{ report.analyzed_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'delete-report' report.id %}" 
+                       class="delete-btn" 
+                       onclick="return confirm('Delete this report?')">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" style="text-align: center;">No reports found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

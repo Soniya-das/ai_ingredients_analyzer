@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .result-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .result-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 30px;
+        padding: 2rem;
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .overall-status {
+        font-size: 3rem;
+        margin: 1rem 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .stat-box {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .ingredient-list {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .ingredient-item {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .ingredient-item:last-child {
+        border-bottom: none;
+    }
+
+    .ingredient-info {
+        flex: 1;
+    }
+
+    .ingredient-name {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #2d3748;
+    }
+
+    .ingredient-description {
+        font-size: 0.8rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+
+    .safe { color: #38a169; font-weight: 600; }
+    .moderate { color: #ed8936; font-weight: 600; }
+    .harmful { color: #e53e3e; font-weight: 600; }
+    .unknown { color: #718096; font-weight: 600; }
+
+    .recommendation {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border-radius: 20px;
+        padding: 2rem;
+        border-left: 5px solid #f59e0b;
+    }
+
+    .btn-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+        background: #cbd5e0;
+        transform: translateY(-2px);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .badge-safe { background: #c6f6d5; color: #22543d; }
+    .badge-moderate { background: #feebc8; color: #7b341e; }
+    .badge-harmful { background: #fed7d7; color: #742a2a; }
+    .badge-unknown { background: #edf2f7; color: #4a5568; }
+</style>
+
+<div class="result-container">
+    <div class="result-header">
+        <h2>Analysis Results for: {{ product_name }}</h2>
+        <div class="overall-status">
+            {% if result.overall_status == 'safe' %}
+                ✅ SAFE TO USE
+            {% elif result.overall_status == 'moderate' %}
+                ⚠️ USE WITH CAUTION
+            {% elif result.overall_status == 'harmful' %}
+                ❌ NOT RECOMMENDED
+            {% else %}
+                ❓ INCONCLUSIVE
+            {% endif %}
+        </div>
+        <p style="margin-top: 0.5rem; opacity: 0.9;">Category: {{ category|title }}</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-value" style="color: #38a169;">{{ result.safe_count }}</div>
+            <div>✅ Safe Ingredients</div>
+            <small style="color: #718096;">No known risk</small>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" style="color: #ed8936;">{{ result.moderate_count }}</div>
+            <div>⚠️ Moderate Ingredients</div>
+            <small style="color: #718096;">May cause sensitivity</small>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" style="color: #e53e3e;">{{ result.harmful_count }}</div>
+            <div>❌ Harmful Ingredients</div>
+            <small style="color: #718096;">Avoid exposure</small>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" style="color: #718096;">{{ result.unknown_count }}</div>
+            <div>❓ Unknown Ingredients</div>
+            <small style="color: #718096;">Insufficient data</small>
+        </div>
+    </div>
+
+    <div class="ingredient-list">
+        <h3 style="margin-bottom: 1rem;">📋 Ingredient Breakdown</h3>
+        {% for ingredient in result.ingredients %}
+        <div class="ingredient-item">
+            <div class="ingredient-info">
+                <div class="ingredient-name">{{ ingredient.name }}</div>
+                <div class="ingredient-description">{{ ingredient.description }}</div>
+                {% if ingredient.side_effects %}
+                <div class="ingredient-description" style="color: #e53e3e;">⚠️ {{ ingredient.side_effects }}</div>
+                {% endif %}
+            </div>
+            <div>
+                {% if ingredient.status == 'safe' %}
+                    <span class="status-badge badge-safe">✅ Safe</span>
+                {% elif ingredient.status == 'moderate' %}
+                    <span class="status-badge badge-moderate">⚠️ Moderate</span>
+                {% elif ingredient.status == 'harmful' %}
+                    <span class="status-badge badge-harmful">❌ Harmful</span>
+                {% else %}
+                    <span class="status-badge badge-unknown">❓ Unknown</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="recommendation">
+        <h3>💡 Recommendation</h3>
+        <p>{{ result.recommendation }}</p>
+        {% if result.unknown_count > 0 %}
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #975a16;">
+            ℹ️ Unknown ingredients are not necessarily harmful – they just haven't been fully evaluated yet.
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="btn-actions">
+        <a href="{% url 'analyzer' %}" class="btn btn-secondary">🔍 Analyze Another</a>
+        <a href="{% url 'report-history' %}" class="btn btn-primary">📊 View Report History</a>
+    </div>
+</div>
+{% endblock %}
