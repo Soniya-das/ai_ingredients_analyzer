@@ -17,6 +17,7 @@ import random
 import os
 import json
 import logging
+from django.core.paginator import Paginator
 
 from .forms import *
 from .models import *
@@ -844,12 +845,32 @@ def view_reports(request):
     }
     return render(request, 'admin/view-reports.html', context)
 
+# @login_required
+# def manage_ingredients(request):
+#     if not request.user.is_superuser:
+#         return redirect('dashboard')
+#     ingredients = Ingredient.objects.all().order_by('name')
+#     return render(request, 'admin/manage-ingredients.html', {'ingredients': ingredients})
+
 @login_required
 def manage_ingredients(request):
     if not request.user.is_superuser:
         return redirect('dashboard')
-    ingredients = Ingredient.objects.all().order_by('name')
-    return render(request, 'admin/manage-ingredients.html', {'ingredients': ingredients})
+    
+    # OPTIMIZED: Fetch only needed fields and paginate
+    ingredients_list = Ingredient.objects.all().only('id', 'name', 'category', 'description').order_by('name')
+    
+    # Pagination - 25 items per page (better performance)
+    paginator = Paginator(ingredients_list, 25)
+    page_number = request.GET.get('page', 1)
+    ingredients = paginator.get_page(page_number)
+    
+    # ✅ FIXED: Added total_count to context
+    return render(request, 'admin/manage-ingredients.html', {
+        'ingredients': ingredients,
+        'total_count': Ingredient.objects.count(),  # THIS WAS MISSING!
+    })
+
 
 @login_required
 def add_ingredient(request):

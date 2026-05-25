@@ -3,43 +3,49 @@
 
 {% block content %}
 <style>
-    /* Admin Skin Reports Page Styles */
+    /* ===== FULLY RESPONSIVE SKIN REPORTS PAGE ===== */
+    * {
+        box-sizing: border-box;
+    }
+    
     .skin-reports-container {
-        padding: 2rem;
+        padding: clamp(10px, 3vw, 2rem);
         max-width: 1400px;
         margin: 0 auto;
     }
     
+    /* Page Header */
     .page-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 24px;
-        padding: 2rem;
-        margin-bottom: 2rem;
+        border-radius: clamp(16px, 4vw, 24px);
+        padding: clamp(1rem, 4vw, 2rem);
+        margin-bottom: clamp(1rem, 3vw, 2rem);
         color: white;
     }
     
     .page-header h1 {
-        font-size: 2rem;
+        font-size: clamp(1.3rem, 5vw, 2rem);
         margin-bottom: 0.5rem;
     }
     
     .page-header p {
         opacity: 0.9;
         margin-bottom: 0;
+        font-size: clamp(0.8rem, 3vw, 0.95rem);
     }
     
-    /* Statistics Cards */
+    /* Statistics Cards - Responsive Grid */
     .stats-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: clamp(12px, 3vw, 1.5rem);
+        margin-bottom: clamp(1rem, 3vw, 2rem);
     }
     
     .stat-card {
         background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
+        border-radius: clamp(16px, 4vw, 20px);
+        padding: clamp(1rem, 3vw, 1.5rem);
         text-align: center;
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         transition: transform 0.3s ease;
@@ -48,11 +54,10 @@
     
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     }
     
     .stat-number {
-        font-size: 2.5rem;
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
         font-weight: 800;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
@@ -62,42 +67,39 @@
     
     .stat-label {
         color: #666;
-        font-size: 0.85rem;
+        font-size: clamp(10px, 2.5vw, 0.85rem);
         margin-top: 0.5rem;
     }
     
     .stat-icon {
-        font-size: 2rem;
+        font-size: clamp(1.2rem, 4vw, 2rem);
         margin-bottom: 0.5rem;
     }
     
-    /* Search Box - Professional Styling */
+    /* Search Section */
     .search-section {
         background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
+        border-radius: clamp(16px, 4vw, 20px);
+        padding: clamp(1rem, 3vw, 1.5rem);
         margin-bottom: 1.5rem;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         border: 1px solid #e9ecef;
     }
     
     .search-title {
-        font-size: 0.9rem;
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
         font-weight: 600;
         color: #333;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-    
-    .search-title-icon {
-        font-size: 1.2rem;
+        flex-wrap: wrap;
     }
     
     .search-input-group {
         display: flex;
-        gap: 1rem;
+        gap: 0.8rem;
         align-items: center;
         flex-wrap: wrap;
     }
@@ -105,24 +107,24 @@
     .search-input-wrapper {
         flex: 1;
         position: relative;
-        min-width: 250px;
+        min-width: 200px;
     }
     
     .search-icon {
         position: absolute;
-        left: 16px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 1.1rem;
+        font-size: 1rem;
         color: #aaa;
     }
     
     .search-input-field {
         width: 100%;
-        padding: 14px 16px 14px 45px;
+        padding: clamp(10px, 3vw, 14px) 16px clamp(10px, 3vw, 14px) 42px;
         border: 2px solid #e9ecef;
         border-radius: 14px;
-        font-size: 0.95rem;
+        font-size: clamp(0.85rem, 3vw, 0.95rem);
         transition: all 0.3s;
         background: #f8f9fa;
     }
@@ -131,22 +133,24 @@
         outline: none;
         border-color: #667eea;
         background: white;
-        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .search-btn, .search-clear {
+        padding: clamp(10px, 3vw, 12px) clamp(16px, 4vw, 28px);
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s;
+        border: none;
     }
     
     .search-btn {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border: none;
-        padding: 12px 28px;
-        border-radius: 14px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s;
     }
     
     .search-btn:hover {
@@ -157,16 +161,6 @@
     .search-clear {
         background: #e9ecef;
         color: #495057;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 14px;
-        cursor: pointer;
-        font-weight: 500;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s;
     }
     
     .search-clear:hover {
@@ -178,7 +172,7 @@
         background: #f8f9fa;
         padding: 8px 16px;
         border-radius: 20px;
-        font-size: 0.85rem;
+        font-size: clamp(0.75rem, 2.5vw, 0.85rem);
         color: #666;
         font-weight: 500;
     }
@@ -187,11 +181,13 @@
     .bulk-actions-bar {
         background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
         border-radius: 16px;
-        padding: 1rem 1.5rem;
+        padding: clamp(0.8rem, 3vw, 1rem) clamp(1rem, 4vw, 1.5rem);
         margin-bottom: 1.5rem;
         display: none;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
         border: 1px solid #667eea30;
     }
     
@@ -204,22 +200,24 @@
         align-items: center;
         gap: 0.5rem;
         font-weight: 500;
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
     }
     
     .selected-count {
         font-weight: 800;
         color: #667eea;
-        font-size: 1.2rem;
+        font-size: clamp(1rem, 4vw, 1.2rem);
     }
     
     .btn-bulk-delete {
         background: #dc3545;
         color: white;
         border: none;
-        padding: 10px 24px;
+        padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 24px);
         border-radius: 12px;
         cursor: pointer;
         font-weight: 600;
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
         display: flex;
         align-items: center;
         gap: 8px;
@@ -229,10 +227,9 @@
     .btn-bulk-delete:hover {
         background: #c82333;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(220,53,69,0.3);
     }
     
-    /* Reports Table */
+    /* Table Container */
     .reports-table {
         background: white;
         border-radius: 20px;
@@ -247,17 +244,19 @@
     
     .reports-table th {
         background: #f8f9fa;
-        padding: 1rem;
+        padding: clamp(0.8rem, 3vw, 1rem);
         text-align: left;
         font-weight: 600;
         color: #333;
         border-bottom: 2px solid #e9ecef;
+        font-size: clamp(0.75rem, 3vw, 0.85rem);
     }
     
     .reports-table td {
-        padding: 1rem;
+        padding: clamp(0.8rem, 3vw, 1rem);
         border-bottom: 1px solid #e9ecef;
         vertical-align: middle;
+        font-size: clamp(0.75rem, 3vw, 0.85rem);
     }
     
     .reports-table tr:hover {
@@ -266,24 +265,25 @@
     
     .reports-table tr.highlight-row {
         background: #e8f0fe;
-        border-left: 3px solid #667eea;
     }
     
     .select-all-checkbox, .row-checkbox {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         cursor: pointer;
         accent-color: #667eea;
     }
     
+    /* Verdict Badges */
     .verdict-badge {
         display: inline-flex;
         align-items: center;
         gap: 0.3rem;
         padding: 0.3rem 0.8rem;
         border-radius: 20px;
-        font-size: 0.75rem;
+        font-size: clamp(0.65rem, 2.5vw, 0.75rem);
         font-weight: 600;
+        white-space: nowrap;
     }
     
     .verdict-excellent { background: #e8f5e9; color: #2e7d32; }
@@ -291,6 +291,7 @@
     .verdict-moderate { background: #fff3e0; color: #e65100; }
     .verdict-avoid { background: #ffebee; color: #c62828; }
     
+    /* Buttons */
     .btn-group {
         display: flex;
         gap: 0.5rem;
@@ -299,11 +300,14 @@
     
     .btn-sm {
         padding: 0.3rem 0.8rem;
-        font-size: 0.75rem;
+        font-size: clamp(0.65rem, 2.5vw, 0.75rem);
         border-radius: 8px;
         text-decoration: none;
         transition: all 0.2s ease;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
     
     .btn-view { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
@@ -321,7 +325,7 @@
         color: #856404;
         padding: 0.2rem 0.5rem;
         border-radius: 12px;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         margin-left: 0.5rem;
     }
     
@@ -346,11 +350,12 @@
     
     .empty-state {
         text-align: center;
-        padding: 3rem;
+        padding: clamp(2rem, 8vw, 3rem);
         color: #6c757d;
     }
-    .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .empty-state-icon { font-size: clamp(2.5rem, 8vw, 4rem); margin-bottom: 1rem; }
     
+    /* Modal */
     .modal {
         display: none;
         position: fixed;
@@ -366,7 +371,7 @@
     
     .modal-content {
         background: white;
-        padding: 30px;
+        padding: clamp(20px, 5vw, 30px);
         border-radius: 20px;
         max-width: 450px;
         width: 90%;
@@ -375,7 +380,7 @@
     
     .warning-text {
         color: #dc3545;
-        font-size: 14px;
+        font-size: clamp(12px, 3vw, 14px);
         margin-top: 15px;
         padding: 10px;
         background: #f8d7da;
@@ -387,19 +392,29 @@
         display: flex;
         gap: 15px;
         justify-content: center;
+        flex-wrap: wrap;
     }
     
-    .modal-confirm { background: #dc3545; color: white; padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; }
-    .modal-cancel { background: #718096; color: white; padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; }
+    .modal-confirm, .modal-cancel {
+        padding: clamp(8px, 2.5vw, 10px) clamp(16px, 5vw, 24px);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: clamp(12px, 3vw, 14px);
+    }
     
+    .modal-confirm { background: #dc3545; color: white; }
+    .modal-cancel { background: #718096; color: white; }
+    
+    /* Toast Message */
     .toast-message {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        padding: 12px 20px;
+        padding: clamp(10px, 3vw, 12px) clamp(15px, 4vw, 20px);
         border-radius: 10px;
         color: white;
-        font-size: 14px;
+        font-size: clamp(12px, 3vw, 14px);
         z-index: 1100;
         animation: slideIn 0.3s ease;
     }
@@ -413,14 +428,154 @@
     .toast-error { background: #dc3545; }
     .toast-info { background: #17a2b8; }
     
+    /* ========== RESPONSIVE BREAKPOINTS ========== */
+    
+    /* Tablet (768px to 1024px) */
+    @media (max-width: 1024px) {
+        .stats-cards {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    /* Mobile (up to 768px) */
     @media (max-width: 768px) {
-        .skin-reports-container { padding: 1rem; }
-        .reports-table { overflow-x: auto; }
-        .reports-table table { min-width: 600px; }
-        .stats-cards { grid-template-columns: repeat(2, 1fr); }
-        .search-input-group { flex-direction: column; }
-        .search-input-wrapper { width: 100%; }
-        .bulk-actions-bar { flex-direction: column; gap: 10px; }
+        .skin-reports-container {
+            padding: 12px;
+        }
+        
+        .stats-cards {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .search-input-group {
+            flex-direction: column;
+        }
+        
+        .search-input-wrapper {
+            width: 100%;
+        }
+        
+        .search-btn, .search-clear {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .search-stats {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .bulk-actions-bar {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .btn-bulk-delete {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Table overflow */
+        .reports-table {
+            overflow-x: auto;
+        }
+        
+        .reports-table table {
+            min-width: 600px;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    /* Very Small Mobile (up to 480px) */
+    @media (max-width: 480px) {
+        .stats-cards {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .stat-card {
+            padding: 12px;
+        }
+        
+        .page-header {
+            text-align: center;
+        }
+        
+        .reports-table td {
+            padding: 10px 8px;
+        }
+        
+        .verdict-badge {
+            white-space: normal;
+        }
+        
+        .score-bar {
+            width: 80px;
+        }
+    }
+    
+    /* Small Mobile (up to 375px) */
+    @media (max-width: 375px) {
+        .stat-number {
+            font-size: 1.3rem;
+        }
+        
+        .stat-icon {
+            font-size: 1rem;
+        }
+        
+        .btn-sm {
+            font-size: 0.6rem;
+            padding: 0.25rem 0.6rem;
+        }
+    }
+    
+    /* Desktop (1281px to 1920px) */
+    @media (min-width: 1281px) and (max-width: 1920px) {
+        .skin-reports-container {
+            max-width: 1400px;
+        }
+    }
+    
+    /* Large Desktop (1921px and above) */
+    @media (min-width: 1921px) {
+        .skin-reports-container {
+            max-width: 1800px;
+        }
+        
+        .stats-cards {
+            gap: 2rem;
+        }
+        
+        .reports-table th, .reports-table td {
+            padding: 1.2rem;
+            font-size: 1rem;
+        }
+    }
+    
+    /* Print Styles */
+    @media print {
+        .search-section, .bulk-actions-bar, .btn-group {
+            display: none;
+        }
+        
+        .page-header {
+            background: #667eea;
+            print-color-adjust: exact;
+        }
+        
+        .reports-table {
+            box-shadow: none;
+        }
     }
 </style>
 
@@ -441,7 +596,7 @@
         <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-number">{{ avoid_count }}</div><div class="stat-label">Avoid</div></div>
     </div>
     
-    <!-- Professional Search Section -->
+    <!-- Search Section -->
     <div class="search-section">
         <div class="search-title">
             <span class="search-title-icon">🔍</span>
@@ -452,12 +607,8 @@
                 <span class="search-icon">👤</span>
                 <input type="text" id="searchInput" class="search-input-field" placeholder="Enter username to search...">
             </div>
-            <button class="search-btn" onclick="performSearch()">
-                🔍 Search
-            </button>
-            <button class="search-clear" onclick="clearSearch()">
-                🗑️ Clear
-            </button>
+            <button class="search-btn" onclick="performSearch()">🔍 Search</button>
+            <button class="search-clear" onclick="clearSearch()">🗑️ Clear</button>
             <span class="search-stats" id="searchStats">Showing all reports</span>
         </div>
     </div>
@@ -488,7 +639,15 @@
                     <td><strong>{{ item.report.overall_score }}/100</strong></td>
                     <td><span class="verdict-badge verdict-{{ item.report.overall_verdict }}">{% if item.report.overall_verdict == 'excellent' %}🌟 Excellent{% elif item.report.overall_verdict == 'good' %}✅ Good{% elif item.report.overall_verdict == 'moderate' %}⚠️ Moderate{% else %}❌ Avoid{% endif %}</span></td>
                     <td>{{ item.report.analyzed_at|date:"Y-m-d H:i" }}</td>
-                    <td><div class="btn-group"><a href="{% url 'skin-report-detail' item.report.id %}" class="btn-sm btn-view">👁️ View</a>{% if item.is_deleted_by_user %}<a href="{% url 'admin-skin-restore-report' item.report.id %}" class="btn-sm btn-restore" onclick="return confirm('Restore this report?')">🔄 Restore</a>{% endif %}<a href="{% url 'admin-skin-delete-report' item.report.id %}" class="btn-sm btn-delete" onclick="return confirm('⚠️ PERMANENT DELETE?')">🗑️ Delete</a></div></td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'skin-report-detail' item.report.id %}" class="btn-sm btn-view">👁️ View</a>
+                            {% if item.is_deleted_by_user %}
+                                <a href="{% url 'admin-skin-restore-report' item.report.id %}" class="btn-sm btn-restore" onclick="return confirm('Restore this report?')">🔄 Restore</a>
+                            {% endif %}
+                            <a href="{% url 'admin-skin-delete-report' item.report.id %}" class="btn-sm btn-delete">🗑️ Delete</a>
+                        </div>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📭</div><p>No skin analysis reports found</p><small>Reports will appear here when users analyze skincare products</small></td></tr>
@@ -515,7 +674,7 @@
     let originalRowsOrder = [];
     let currentSearchTerm = '';
     
-    // ========== SEARCH FUNCTION - On Button Click ==========
+    // ========== SEARCH FUNCTION ==========
     function performSearch() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
         currentSearchTerm = searchTerm;
@@ -524,12 +683,10 @@
         const rows = Array.from(document.querySelectorAll('.report-row'));
         let visibleCount = 0;
         
-        // Store original order if not already stored
         if (originalRowsOrder.length === 0 && rows.length > 0) {
             originalRowsOrder = [...rows];
         }
         
-        // Separate matched and unmatched rows
         const matchedRows = [];
         const unmatchedRows = [];
         
@@ -540,7 +697,6 @@
             if (isMatch) {
                 visibleCount++;
                 row.style.display = '';
-                row.classList.remove('hidden-row');
                 if (searchTerm !== '') {
                     row.classList.add('highlight-row');
                 } else {
@@ -549,7 +705,6 @@
                 matchedRows.push(row);
             } else {
                 row.style.display = 'none';
-                row.classList.add('hidden-row');
                 row.classList.remove('highlight-row');
                 unmatchedRows.push(row);
                 const checkbox = row.querySelector('.row-checkbox');
@@ -557,16 +712,12 @@
             }
         });
         
-        // Reorder DOM - matched rows come FIRST (at the TOP)
         if (searchTerm !== '' && matchedRows.length > 0) {
             while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
             matchedRows.forEach(row => tbody.appendChild(row));
             unmatchedRows.forEach(row => tbody.appendChild(row));
-            
-            // Show success message
             showToast(`Found ${visibleCount} report(s) for "${searchTerm}"`, 'success');
         } else if (searchTerm === '') {
-            // Restore original order
             if (originalRowsOrder.length > 0) {
                 while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
                 originalRowsOrder.forEach(row => tbody.appendChild(row));
@@ -576,7 +727,6 @@
             showToast(`No reports found for "${searchTerm}"`, 'error');
         }
         
-        // Update search stats
         const searchStats = document.getElementById('searchStats');
         const totalRows = rows.length;
         if (searchTerm === '') {
@@ -596,8 +746,8 @@
     // ========== BULK SELECT FUNCTIONS ==========
     function toggleSelectAll() {
         const selectAll = document.getElementById('selectAllCheckbox');
-        const visibleRows = document.querySelectorAll('.report-row:not(.hidden-row)');
-        const checkboxes = document.querySelectorAll('.report-row:not(.hidden-row) .row-checkbox');
+        const visibleRows = document.querySelectorAll('.report-row:not([style*="display: none"])');
+        const checkboxes = document.querySelectorAll('.report-row:not([style*="display: none"]) .row-checkbox');
         
         checkboxes.forEach(checkbox => {
             checkbox.checked = selectAll.checked;
@@ -608,7 +758,7 @@
     }
     
     function updateBulkActions() {
-        const visibleCheckboxes = document.querySelectorAll('.report-row:not(.hidden-row) .row-checkbox');
+        const visibleCheckboxes = document.querySelectorAll('.report-row:not([style*="display: none"]) .row-checkbox');
         const bulkBar = document.getElementById('bulkActionsBar');
         const selectedCountSpan = document.getElementById('selectedCount');
         
@@ -619,7 +769,8 @@
         
         const count = selectedReports.size;
         selectedCountSpan.innerText = count;
-        count > 0 ? bulkBar.classList.add('show') : bulkBar.classList.remove('show');
+        if (count > 0) bulkBar.classList.add('show');
+        else bulkBar.classList.remove('show');
         
         const selectAll = document.getElementById('selectAllCheckbox');
         const totalVisible = visibleCheckboxes.length;
@@ -677,11 +828,14 @@
     function closeBulkModal() { document.getElementById('bulkDeleteModal').style.display = 'none'; }
     
     function showToast(message, type) {
+        const existingToasts = document.querySelectorAll('.toast-message');
+        existingToasts.forEach(toast => toast.remove());
+        
         const toast = document.createElement('div');
         toast.className = `toast-message toast-${type}`;
         toast.innerHTML = message;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => { if(toast && toast.remove) toast.remove(); }, 3000);
     }
     
     // Enter key support
@@ -695,8 +849,7 @@
     };
     
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Skin Reports Page Loaded');
-        filterReports = performSearch; // Fallback
+        updateBulkActions();
     });
 </script>
 {% endblock %}

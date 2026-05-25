@@ -5,25 +5,43 @@
 
 {% block content %}
 <style>
+    /* ========== BASE STYLES ========== */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    
     .admin-container {
         background: white;
-        border-radius: 30px;
-        padding: 2rem;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin: 15px;
+        overflow-x: auto;
     }
     
     .admin-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 20px;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 15px;
     }
     
     .admin-header h2 {
         margin: 0;
+        font-size: 24px;
         color: #1A1A1A;
+    }
+    
+    .total-badge {
+        background: #e2e8f0;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #2d3748;
     }
     
     .btn-add {
@@ -33,7 +51,9 @@
         border-radius: 25px;
         text-decoration: none;
         font-weight: 600;
-        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 14px;
+        transition: 0.3s;
     }
     
     .btn-add:hover {
@@ -41,9 +61,14 @@
         box-shadow: 0 5px 15px rgba(39,174,96,0.3);
     }
     
+    .table-wrapper {
+        overflow-x: auto;
+    }
+    
     .ingredient-table {
         width: 100%;
         border-collapse: collapse;
+        background: white;
     }
     
     .ingredient-table th,
@@ -57,8 +82,14 @@
         background: #f7fafc;
         font-weight: bold;
         color: #2d3748;
+        font-size: 14px;
     }
     
+    .ingredient-table td {
+        font-size: 14px;
+    }
+    
+    /* Badge Styles */
     .badge-safe {
         background: #48bb78;
         color: white;
@@ -86,31 +117,73 @@
         display: inline-block;
     }
     
+    /* Action Buttons */
     .action-btns {
         display: flex;
-        gap: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
     }
     
-    .btn-edit {
-        background: #3498DB;
+    .btn-edit, .btn-delete {
         color: white;
-        padding: 4px 12px;
+        padding: 5px 12px;
         border-radius: 15px;
         text-decoration: none;
         font-size: 12px;
+        transition: 0.3s;
+        display: inline-block;
     }
     
-    .btn-delete {
-        background: #E74C3C;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 15px;
-        text-decoration: none;
-        font-size: 12px;
-    }
+    .btn-edit { background: #3498DB; }
+    .btn-delete { background: #E74C3C; }
     
     .btn-edit:hover, .btn-delete:hover {
         opacity: 0.8;
+        transform: scale(1.05);
+    }
+    
+    /* Pagination */
+    .pagination-container {
+        margin: 30px 0 20px;
+        text-align: center;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .page-btn, .page-current {
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        transition: 0.3s;
+        font-size: 14px;
+    }
+    
+    .page-btn {
+        background: #3498DB;
+        color: white;
+    }
+    
+    .page-btn:hover {
+        background: #2980B9;
+        transform: translateY(-2px);
+    }
+    
+    .page-current {
+        background: #2C3E50;
+        color: white;
+    }
+    
+    .page-info {
+        color: #666;
+        font-size: 14px;
+        margin-top: 10px;
     }
     
     .back-link {
@@ -118,52 +191,490 @@
         margin-top: 20px;
         color: #666;
         text-decoration: none;
+        font-size: 14px;
     }
     
     .back-link:hover {
         text-decoration: underline;
     }
+    
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+    }
+    
+    .empty-state a {
+        color: #27AE60;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    /* ========== RESPONSIVE BREAKPOINTS ========== */
+    
+    /* 320px - 480px (Small Mobile) */
+    @media (max-width: 480px) {
+        .admin-container {
+            padding: 12px;
+            margin: 8px;
+            border-radius: 15px;
+        }
+        
+        .admin-header h2 {
+            font-size: 18px;
+        }
+        
+        .total-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+        }
+        
+        .btn-add {
+            font-size: 12px;
+            padding: 8px 15px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .admin-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .ingredient-table th,
+        .ingredient-table td {
+            padding: 8px 6px;
+            font-size: 11px;
+        }
+        
+        .badge-safe, .badge-moderate, .badge-harmful {
+            font-size: 9px;
+            padding: 3px 6px;
+        }
+        
+        .btn-edit, .btn-delete {
+            font-size: 10px;
+            padding: 4px 10px;
+        }
+        
+        .action-btns {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .btn-edit, .btn-delete {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .page-btn, .page-current {
+            padding: 5px 10px;
+            font-size: 11px;
+        }
+        
+        .page-info {
+            font-size: 11px;
+        }
+        
+        /* Card view for very small */
+        .ingredient-table,
+        .ingredient-table thead,
+        .ingredient-table tbody,
+        .ingredient-table tr,
+        .ingredient-table th,
+        .ingredient-table td {
+            display: block;
+        }
+        
+        .ingredient-table thead {
+            display: none;
+        }
+        
+        .ingredient-table tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .ingredient-table td {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .ingredient-table td:last-child {
+            border-bottom: none;
+        }
+        
+        .ingredient-table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            width: 100px;
+            font-size: 11px;
+        }
+    }
+    
+    /* 481px - 767px (Medium Mobile - Card View) */
+    @media (min-width: 481px) and (max-width: 767px) {
+        .admin-container {
+            padding: 15px;
+            margin: 10px;
+        }
+        
+        .admin-header h2 {
+            font-size: 20px;
+        }
+        
+        .btn-add {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .admin-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        /* Card view */
+        .ingredient-table,
+        .ingredient-table thead,
+        .ingredient-table tbody,
+        .ingredient-table tr,
+        .ingredient-table th,
+        .ingredient-table td {
+            display: block;
+        }
+        
+        .ingredient-table thead {
+            display: none;
+        }
+        
+        .ingredient-table tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fafafa;
+        }
+        
+        .ingredient-table td {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .ingredient-table td:last-child {
+            border-bottom: none;
+        }
+        
+        .ingredient-table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            width: 120px;
+            font-size: 12px;
+        }
+        
+        .action-btns {
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+        
+        .btn-edit, .btn-delete {
+            width: auto;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .pagination {
+            gap: 5px;
+        }
+        
+        .page-btn, .page-current {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+    }
+    
+    /* 768px (Tablet - Card View) */
+    @media (min-width: 768px) and (max-width: 768px) {
+        .admin-container {
+            padding: 18px;
+            margin: 12px;
+        }
+        
+        /* Card view for 768px */
+        .ingredient-table,
+        .ingredient-table thead,
+        .ingredient-table tbody,
+        .ingredient-table tr,
+        .ingredient-table th,
+        .ingredient-table td {
+            display: block;
+        }
+        
+        .ingredient-table thead {
+            display: none;
+        }
+        
+        .ingredient-table tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .ingredient-table td {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .ingredient-table td:last-child {
+            border-bottom: none;
+        }
+        
+        .ingredient-table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            width: 130px;
+        }
+        
+        .action-btns {
+            flex-direction: row;
+        }
+    }
+    
+    /* 769px - 1024px (Tablet - Optimized) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .admin-container {
+            padding: 20px;
+            margin: 15px;
+        }
+        
+        .ingredient-table th,
+        .ingredient-table td {
+            padding: 10px 8px;
+            font-size: 13px;
+        }
+        
+        .btn-edit, .btn-delete {
+            font-size: 11px;
+            padding: 4px 10px;
+        }
+        
+        .badge-safe, .badge-moderate, .badge-harmful {
+            font-size: 11px;
+            padding: 3px 8px;
+        }
+    }
+    
+    /* 1025px - 1280px (Small Laptop - Centered) */
+    @media (min-width: 1025px) and (max-width: 1280px) {
+        .admin-container {
+            max-width: 95%;
+            margin: 20px auto;
+            padding: 25px;
+        }
+        
+        .ingredient-table th,
+        .ingredient-table td {
+            padding: 12px;
+            font-size: 14px;
+        }
+    }
+    
+    /* 1281px - 1920px (Desktop - Max-width 1400px) */
+    @media (min-width: 1281px) and (max-width: 1920px) {
+        .admin-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 30px;
+        }
+        
+        .ingredient-table th,
+        .ingredient-table td {
+            padding: 15px;
+            font-size: 15px;
+        }
+        
+        .btn-edit, .btn-delete {
+            font-size: 13px;
+            padding: 6px 14px;
+        }
+        
+        .admin-header h2 {
+            font-size: 28px;
+        }
+        
+        .badge-safe, .badge-moderate, .badge-harmful {
+            font-size: 13px;
+            padding: 5px 12px;
+        }
+    }
+    
+    /* 1921px+ (Large Desktop - Max-width 1800px) */
+    @media (min-width: 1921px) {
+        .admin-container {
+            max-width: 1800px;
+            margin: 40px auto;
+            padding: 40px;
+        }
+        
+        .ingredient-table th,
+        .ingredient-table td {
+            padding: 20px;
+            font-size: 18px;
+        }
+        
+        .admin-header h2 {
+            font-size: 34px;
+        }
+        
+        .total-badge {
+            font-size: 16px;
+            padding: 6px 15px;
+        }
+        
+        .btn-add {
+            font-size: 16px;
+            padding: 12px 28px;
+        }
+        
+        .badge-safe, .badge-moderate, .badge-harmful {
+            font-size: 14px;
+            padding: 6px 14px;
+        }
+        
+        .btn-edit, .btn-delete {
+            font-size: 15px;
+            padding: 8px 18px;
+        }
+        
+        .page-btn, .page-current {
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+        
+        .page-info, .back-link {
+            font-size: 16px;
+        }
+        
+        .ingredient-table td {
+            font-size: 18px;
+        }
+        
+        .ingredient-table th {
+            font-size: 18px;
+        }
+    }
+    
+    /* Hover Effects (Desktop only) */
+    @media (min-width: 1025px) {
+        .ingredient-table tr:hover {
+            background: #f7fafc;
+            transition: background 0.3s ease;
+        }
+    }
+    
+    /* Print Styles */
+    @media print {
+        body {
+            background: white;
+        }
+        
+        .btn-add, .btn-edit, .btn-delete, .back-link, .pagination-container {
+            display: none;
+        }
+        
+        .admin-container {
+            box-shadow: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .ingredient-table {
+            border: 1px solid #ddd;
+        }
+        
+        .ingredient-table td::before {
+            content: attr(data-label);
+        }
+    }
 </style>
 
 <div class="admin-container">
     <div class="admin-header">
-        <h2>📋 Manage Ingredients</h2>
+        <div>
+            <h2>📋 Manage Ingredients</h2>
+            <span class="total-badge">Total: {{ total_count }} ingredients</span>
+        </div>
         <a href="{% url 'add-ingredient' %}" class="btn-add">+ Add New Ingredient</a>
     </div>
     
-    <table class="ingredient-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Ingredient Name</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ingredient in ingredients %}
-            <tr>
-                <td>{{ ingredient.id }}</td>
-                <td><strong>{{ ingredient.name }}</strong></td>
-                <td>
-                    <span class="badge-{{ ingredient.category }}">
-                        {{ ingredient.category|upper }}
-                    </span>
-                </td>
-                <td>{{ ingredient.description|truncatechars:50 }}</td>
-                <td class="action-btns">
-                    <a href="{% url 'edit-ingredient' ingredient.id %}" class="btn-edit">Edit</a>
-                    <a href="{% url 'delete-ingredient' ingredient.id %}" class="btn-delete" onclick="return confirm('Delete {{ ingredient.name }}?')">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center;">No ingredients found. <a href="{% url 'add-ingredient' %}">Add your first ingredient</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-wrapper">
+        <table class="ingredient-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ingredient Name</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ingredient in ingredients %}
+                <tr>
+                    <td data-label="ID">{{ ingredient.id }}</td>
+                    <td data-label="Ingredient Name"><strong>{{ ingredient.name }}</strong></td>
+                    <td data-label="Category">
+                        <span class="badge-{{ ingredient.category }}">
+                            {{ ingredient.category|upper }}
+                        </span>
+                    </td>
+                    <td data-label="Description">{{ ingredient.description|truncatechars:50|default:"No description" }}</td>
+                    <td data-label="Actions" class="action-btns">
+                        <a href="{% url 'edit-ingredient' ingredient.id %}" class="btn-edit">✏️ Edit</a>
+                        <a href="{% url 'delete-ingredient' ingredient.id %}" class="btn-delete" onclick="return confirm('Delete {{ ingredient.name }}?')">🗑️ Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        No ingredients found. <a href="{% url 'add-ingredient' %}">Add your first ingredient</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination Section -->
+    {% if ingredients.has_other_pages %}
+    <div class="pagination-container">
+        <div class="pagination">
+            {% if ingredients.has_previous %}
+                <a href="?page=1" class="page-btn">« First</a>
+                <a href="?page={{ ingredients.previous_page_number }}" class="page-btn">‹ Previous</a>
+            {% endif %}
+            
+            <span class="page-current">
+                {{ ingredients.number }} / {{ ingredients.paginator.num_pages }}
+            </span>
+            
+            {% if ingredients.has_next %}
+                <a href="?page={{ ingredients.next_page_number }}" class="page-btn">Next ›</a>
+                <a href="?page={{ ingredients.paginator.num_pages }}" class="page-btn">Last »</a>
+            {% endif %}
+        </div>
+        <div class="page-info">
+            Showing {{ ingredients.start_index }} - {{ ingredients.end_index }} of {{ ingredients.paginator.count }} ingredients
+        </div>
+    </div>
+    {% endif %}
     
     <a href="{% url 'admin-dashboard' %}" class="back-link">← Back to Dashboard</a>
 </div>

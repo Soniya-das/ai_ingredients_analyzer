@@ -2,17 +2,22 @@
 
 {% block content %}
 <style>
-    /* ===== BASE STYLES ===== */
+    /* ===== BASE STYLES - FULLY RESPONSIVE ===== */
+    * {
+        box-sizing: border-box;
+    }
+    
     .reports-container {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 20px;
+        padding: clamp(10px, 3vw, 20px);
     }
     
+    /* ===== HEADER SECTION ===== */
     .reports-header {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
-        padding: 25px;
+        padding: clamp(15px, 4vw, 25px);
         border-radius: 20px;
         margin-bottom: 25px;
         display: flex;
@@ -24,12 +29,12 @@
     
     .reports-header h2 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: clamp(1.2rem, 5vw, 1.5rem);
     }
     
     .reports-header p {
         margin: 5px 0 0 0;
-        font-size: 0.85rem;
+        font-size: clamp(0.7rem, 3vw, 0.85rem);
         opacity: 0.9;
     }
     
@@ -37,16 +42,17 @@
         display: flex;
         gap: 12px;
         align-items: center;
+        flex-wrap: wrap;
     }
     
     .btn-export-top {
         background: rgba(255,255,255,0.2);
         border: 1px solid rgba(255,255,255,0.3);
         color: white;
-        padding: 10px 20px;
+        padding: clamp(8px, 3vw, 10px) clamp(15px, 4vw, 20px);
         border-radius: 12px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: clamp(12px, 3.5vw, 14px);
         font-weight: 500;
         transition: all 0.3s ease;
         display: inline-flex;
@@ -55,35 +61,25 @@
         backdrop-filter: blur(10px);
     }
     
-    .btn-export-top:hover {
-        background: rgba(255,255,255,0.3);
-        transform: translateY(-2px);
-        border-color: rgba(255,255,255,0.5);
-    }
-    
     /* ===== STATISTICS CARDS ===== */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: clamp(15px, 3vw, 20px);
         margin-bottom: 30px;
     }
     
     .stat-card {
         background: white;
-        padding: 20px;
+        padding: clamp(15px, 4vw, 20px);
         border-radius: 15px;
         text-align: center;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         transition: transform 0.3s;
     }
     
-    .stat-card:hover {
-        transform: translateY(-5px);
-    }
-    
     .stat-number {
-        font-size: 36px;
+        font-size: clamp(24px, 6vw, 36px);
         font-weight: bold;
         background: linear-gradient(135deg, #667eea, #764ba2);
         -webkit-background-clip: text;
@@ -94,78 +90,100 @@
     .stat-label {
         color: #666;
         margin-top: 8px;
-        font-size: 14px;
+        font-size: clamp(11px, 3vw, 14px);
+    }
+    
+    /* ===== SEARCH BOX ===== */
+    .search-box {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: clamp(10px, 3vw, 12px);
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: clamp(12px, 3.5vw, 14px);
+        min-width: 200px;
+    }
+    
+    .search-btn {
+        padding: clamp(10px, 3vw, 12px) clamp(16px, 4vw, 24px);
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: clamp(12px, 3.5vw, 14px);
     }
     
     /* ===== BULK ACTIONS BAR ===== */
     .bulk-actions-bar {
         background: white;
-        padding: 15px 20px;
+        padding: clamp(12px, 3vw, 15px) clamp(15px, 4vw, 20px);
         border-radius: 12px;
         margin-bottom: 20px;
         display: none;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        border: 1px solid #e2e8f0;
     }
     
     .bulk-actions-bar.show {
         display: flex;
     }
     
-    .selected-count {
-        font-weight: bold;
-        color: #667eea;
-    }
-    
     .btn-bulk-delete {
         background: #dc3545;
         color: white;
-        padding: 10px 24px;
+        padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 24px);
         border: none;
         border-radius: 8px;
         cursor: pointer;
         font-weight: 600;
+        font-size: clamp(12px, 3.5vw, 14px);
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.3s;
     }
     
-    .btn-bulk-delete:hover {
-        background: #c82333;
-        transform: translateY(-1px);
+    /* ===== TABLE CONTAINER ===== */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        background: white;
     }
     
-    /* ===== TABLE STYLES ===== */
     .reports-table {
         width: 100%;
         background: white;
-        border-radius: 20px;
-        overflow: hidden;
         border-collapse: collapse;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     }
     
     .reports-table th {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
-        padding: 15px;
+        padding: 12px 15px;
         text-align: left;
         font-weight: 600;
+        font-size: 13px;
     }
     
     .reports-table td {
         padding: 12px 15px;
         border-bottom: 1px solid #e2e8f0;
         vertical-align: middle;
+        font-size: 13px;
     }
     
-    .reports-table tr:hover {
-        background: #f7fafc;
-    }
-    
+    /* Checkbox */
     .select-all-checkbox, .row-checkbox {
         width: 18px;
         height: 18px;
@@ -173,13 +191,13 @@
         accent-color: #667eea;
     }
     
-    /* ===== BADGES ===== */
+    /* Badges */
     .badge-safe {
         background: #d4edda;
         color: #155724;
-        padding: 5px 12px;
+        padding: 4px 10px;
         border-radius: 20px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: bold;
         display: inline-block;
     }
@@ -187,9 +205,9 @@
     .badge-moderate {
         background: #fff3cd;
         color: #856404;
-        padding: 5px 12px;
+        padding: 4px 10px;
         border-radius: 20px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: bold;
         display: inline-block;
     }
@@ -197,91 +215,214 @@
     .badge-harmful {
         background: #f8d7da;
         color: #721c24;
-        padding: 5px 12px;
+        padding: 4px 10px;
         border-radius: 20px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: bold;
         display: inline-block;
     }
     
     .ingredient-preview {
-        font-size: 12px;
-        white-space: normal;
-        max-width: 250px;
+        font-size: 11px;
+        max-width: 200px;
     }
     
     .ingredient-badge {
         display: inline-block;
-        padding: 2px 8px;
+        padding: 2px 6px;
         border-radius: 12px;
         margin: 2px;
-        font-size: 10px;
+        font-size: 9px;
+        background: #e2e8f0;
     }
     
-    .badge-safe-badge {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .badge-moderate-badge {
-        background: #fff3cd;
-        color: #856404;
-    }
-    
-    .badge-harmful-badge {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    /* ===== BUTTONS ===== */
+    /* Action Buttons */
     .action-buttons {
         display: flex;
         gap: 8px;
-        align-items: center;
+        flex-wrap: wrap;
     }
     
     .btn-view {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
-        padding: 6px 14px;
+        padding: 5px 12px;
         border-radius: 8px;
         text-decoration: none;
-        font-size: 12px;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
         border: none;
         cursor: pointer;
-    }
-    
-    .btn-view:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
     .btn-delete {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
         background: #dc3545;
         color: white;
-        padding: 6px 12px;
+        padding: 5px 12px;
         border-radius: 8px;
         border: none;
         cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
     
-    .btn-delete:hover {
-        background: #c82333;
-        transform: translateY(-2px);
+    /* ========== MOBILE RESPONSIVE - CARD VIEW ========== */
+    @media (max-width: 768px) {
+        .reports-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .header-actions {
+            justify-content: center;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .search-box {
+            flex-direction: column;
+        }
+        
+        .search-btn {
+            width: 100%;
+        }
+        
+        .bulk-actions-bar {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .btn-bulk-delete {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Convert table to cards */
+        .reports-table,
+        .reports-table thead,
+        .reports-table tbody,
+        .reports-table tr,
+        .reports-table th,
+        .reports-table td {
+            display: block;
+        }
+        
+        .reports-table thead {
+            display: none;
+        }
+        
+        .reports-table tr {
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            background: white;
+            display: block;
+        }
+        
+        .reports-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: right;
+        }
+        
+        .reports-table td:last-child {
+            border-bottom: none;
+        }
+        
+        .reports-table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            text-align: left;
+            flex: 1;
+            font-size: 12px;
+            color: #4a5568;
+            padding-right: 15px;
+        }
+        
+        /* First cell (checkbox) special handling */
+        .reports-table td:first-child {
+            justify-content: flex-start;
+        }
+        
+        .reports-table td:first-child::before {
+            display: none;
+        }
+        
+        .action-buttons {
+            justify-content: flex-end;
+            width: 100%;
+        }
+        
+        .ingredient-preview {
+            max-width: 100%;
+        }
     }
     
-    /* ===== MODAL ===== */
+    /* Very Small Mobile (up to 480px) */
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .stat-card {
+            padding: 12px;
+        }
+        
+        .reports-table td {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+        
+        .reports-table td::before {
+            margin-bottom: 5px;
+            width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-view, .btn-delete {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    /* Tablet (769px to 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .reports-table th,
+        .reports-table td {
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+        
+        .ingredient-preview {
+            max-width: 150px;
+        }
+    }
+    
+    /* Desktop */
+    @media (min-width: 1025px) {
+        .reports-table {
+            min-width: 100%;
+        }
+    }
+    
+    /* Modal Styles */
     .modal {
         display: none;
         position: fixed;
@@ -297,7 +438,7 @@
     
     .modal-content {
         background: white;
-        padding: 30px;
+        padding: clamp(20px, 5vw, 30px);
         border-radius: 20px;
         max-width: 450px;
         width: 90%;
@@ -309,6 +450,7 @@
         font-weight: bold;
         font-size: 18px;
         margin: 10px 0;
+        word-break: break-word;
     }
     
     .warning-text {
@@ -325,53 +467,25 @@
         display: flex;
         gap: 15px;
         justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .modal-confirm, .modal-cancel {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
     }
     
     .modal-confirm {
         background: #dc3545;
         color: white;
-        padding: 10px 24px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
     }
     
     .modal-cancel {
         background: #718096;
         color: white;
-        padding: 10px 24px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-    
-    /* ===== SEARCH ===== */
-    .search-box {
-        margin-bottom: 20px;
-        display: flex;
-        gap: 10px;
-    }
-    
-    .search-input {
-        flex: 1;
-        padding: 12px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-    }
-    
-    .search-input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-    
-    .search-btn {
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
     }
     
     .toast-message {
@@ -405,22 +519,9 @@
         background: #dc3545;
     }
     
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .reports-table {
-            font-size: 11px;
-        }
-        .action-buttons {
-            flex-direction: column;
-        }
-        .reports-header {
-            flex-direction: column;
-            text-align: center;
-        }
-        .header-actions {
-            justify-content: center;
+    @media print {
+        .btn-export-top, .search-box, .bulk-actions-bar, .action-buttons {
+            display: none;
         }
     }
 </style>
@@ -477,7 +578,7 @@
     </div>
     
     <!-- Reports Table -->
-    <div style="overflow-x: auto;">
+    <div class="table-container">
         <table class="reports-table" id="reportsTable">
             <thead>
                 <tr>
@@ -499,28 +600,28 @@
             <tbody>
                 {% for item in reports %}
                 {% with report=item.report %}
-                <tr class="report-row" data-report-id="{{ report.id }}" style="display: table-row;">
-                    <td style="text-align: center;">
+                <tr class="report-row" data-report-id="{{ report.id }}">
+                    <td data-label="Select">
                         <input type="checkbox" class="row-checkbox" data-report-id="{{ report.id }}" onclick="updateBulkActions()">
                     </td>
-                    <td class="col-id" style="font-weight: bold; color: #667eea;">{{ report.id }}</td>
-                    <td class="col-user">
+                    <td data-label="ID" style="font-weight: bold; color: #667eea;">{{ report.id }}</td>
+                    <td data-label="User">
                         <strong class="user-name">{{ item.username_display }}</strong><br>
                         <small class="user-email" style="color: #718096;">{{ report.user.email }}</small>
                     </td>
-                    <td class="col-product" style="font-weight: 500;">{{ report.product_name }}</td>
-                    <td class="ingredient-preview">
+                    <td data-label="Product Name" style="font-weight: 500;">{{ report.product_name }}</td>
+                    <td data-label="Ingredients Preview" class="ingredient-preview">
                         {% for ing in item.ingredients|slice:":4" %}
-                            <span class="ingredient-badge badge-{{ ing.status }}-badge">{{ ing.name }}</span>
+                            <span class="ingredient-badge">{{ ing.name }}</span>
                         {% endfor %}
                         {% if item.ingredient_count > 4 %}
                             ... ({{ item.ingredient_count }} total)
                         {% endif %}
                     </td>
-                    <td class="col-safe" style="text-align: center; font-weight: bold; color: #28a745;">{{ report.safe_ingredients }}</td>
-                    <td class="col-moderate" style="text-align: center; font-weight: bold; color: #ffc107;">{{ report.moderate_ingredients }}</td>
-                    <td class="col-harmful" style="text-align: center; font-weight: bold; color: #dc3545;">{{ report.harmful_ingredients }}</td>
-                    <td class="col-status">
+                    <td data-label="Safe" style="text-align: center; font-weight: bold; color: #28a745;">{{ report.safe_ingredients }}</td>
+                    <td data-label="Moderate" style="text-align: center; font-weight: bold; color: #ffc107;">{{ report.moderate_ingredients }}</td>
+                    <td data-label="Harmful" style="text-align: center; font-weight: bold; color: #dc3545;">{{ report.harmful_ingredients }}</td>
+                    <td data-label="Status">
                         {% if report.overall_status == 'safe' %}
                             <span class="badge-safe">✅ Safe</span>
                         {% elif report.overall_status == 'moderate' %}
@@ -529,8 +630,8 @@
                             <span class="badge-harmful">❌ Harmful</span>
                         {% endif %}
                     </td>
-                    <td class="col-date" style="font-size: 12px; color: #666;">{{ report.analyzed_at|date:"Y-m-d H:i" }}</td>
-                    <td>
+                    <td data-label="Analyzed On" style="font-size: 12px; color: #666;">{{ report.analyzed_at|date:"Y-m-d H:i" }}</td>
+                    <td data-label="Actions">
                         <div class="action-buttons">
                             <a href="{% url 'report' report.id %}" class="btn-view">👁️ View</a>
                             <button class="btn-delete" onclick="showDeleteModal({{ report.id }}, '{{ report.product_name|escapejs }}')">🗑️ Delete</button>
@@ -552,7 +653,7 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <div style="font-size: 48px;">🗑️</div>
@@ -567,7 +668,7 @@
     </div>
 </div>
 
-<!-- Bulk Delete Confirmation Modal -->
+<!-- Bulk Delete Modal -->
 <div id="bulkDeleteModal" class="modal">
     <div class="modal-content">
         <div style="font-size: 48px;">🗑️</div>
@@ -634,7 +735,8 @@
         let listHtml = '<ul style="margin:0; padding-left:20px;">';
         document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
             const row = checkbox.closest('.report-row');
-            const productName = row ? row.querySelector('.col-product')?.innerText : 'Unknown';
+            const cells = row.querySelectorAll('td');
+            const productName = cells[3]?.innerText || 'Unknown';
             listHtml += `<li>${productName}</li>`;
         });
         listHtml += '</ul>';
@@ -704,16 +806,10 @@
         let visibleCount = 0;
         
         rows.forEach(row => {
-            const id = row.querySelector('.col-id')?.innerText.toLowerCase() || '';
-            const userName = row.querySelector('.user-name')?.innerText.toLowerCase() || '';
-            const userEmail = row.querySelector('.user-email')?.innerText.toLowerCase() || '';
-            const product = row.querySelector('.col-product')?.innerText.toLowerCase() || '';
-            const status = row.querySelector('.col-status')?.innerText.toLowerCase() || '';
-            
-            const text = `${id} ${userName} ${userEmail} ${product} ${status}`;
+            const text = row.innerText.toLowerCase();
             
             if (text.includes(filter)) {
-                row.style.display = 'table-row';
+                row.style.display = '';
                 visibleCount++;
             } else {
                 row.style.display = 'none';
@@ -731,8 +827,7 @@
             
             for (let i = 0; i < allRows.length; i++) {
                 const row = allRows[i];
-                const displayStyle = window.getComputedStyle(row).display;
-                if (displayStyle !== 'none') {
+                if (row.style.display !== 'none') {
                     visibleRows.push(row);
                 }
             }
@@ -746,31 +841,21 @@
             
             for (let i = 0; i < visibleRows.length; i++) {
                 const row = visibleRows[i];
+                const cells = row.querySelectorAll('td');
                 
-                const reportId = row.querySelector('.col-id')?.innerText.trim() || '';
-                const userName = row.querySelector('.user-name')?.innerText.trim() || '';
-                const userEmail = row.querySelector('.user-email')?.innerText.trim() || '';
-                let productName = row.querySelector('.col-product')?.innerText.trim() || '';
-                const safeCount = row.querySelector('.col-safe')?.innerText.trim() || '0';
-                const moderateCount = row.querySelector('.col-moderate')?.innerText.trim() || '0';
-                const harmfulCount = row.querySelector('.col-harmful')?.innerText.trim() || '0';
+                const reportId = cells[1]?.innerText.trim() || '';
+                const userName = cells[2]?.querySelector('.user-name')?.innerText.trim() || '';
+                const userEmail = cells[2]?.querySelector('.user-email')?.innerText.trim() || '';
+                const productName = cells[3]?.innerText.trim() || '';
+                const safeCount = cells[5]?.innerText.trim() || '0';
+                const moderateCount = cells[6]?.innerText.trim() || '0';
+                const harmfulCount = cells[7]?.innerText.trim() || '0';
+                let status = cells[8]?.innerText.trim() || '';
+                const date = cells[9]?.innerText.trim() || '';
                 
-                let status = row.querySelector('.col-status')?.innerText.trim() || '';
                 status = status.replace('✅', '').replace('⚠️', '').replace('❌', '').trim();
                 
-                const date = row.querySelector('.col-date')?.innerText.trim() || '';
-                
-                if (productName.includes(',')) {
-                    productName = `"${productName}"`;
-                }
-                if (userName.includes(',')) {
-                    userName = `"${userName}"`;
-                }
-                if (userEmail.includes(',')) {
-                    userEmail = `"${userEmail}"`;
-                }
-                
-                csvContent += `${reportId},${userName},${userEmail},${productName},${safeCount},${moderateCount},${harmfulCount},${status},${date}\n`;
+                csvContent += `"${reportId}","${userName}","${userEmail}","${productName}",${safeCount},${moderateCount},${harmfulCount},"${status}","${date}"\n`;
             }
             
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });

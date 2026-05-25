@@ -4,6 +4,7 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
@@ -16,23 +17,6 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return self.user.username
-
-# class Ingredient(models.Model):
-#     name = models.CharField(max_length=200, unique=True)
-#     category = models.CharField(max_length=50, choices=[
-#         ('safe', 'Safe ✅'), ('moderate', 'Moderate ⚠️'), ('harmful', 'Harmful ❌')
-#     ])
-#     description = models.TextField()
-#     side_effects = models.TextField(blank=True)
-#     suitable_for = models.CharField(max_length=200)
-#     not_suitable_for = models.CharField(max_length=200, blank=True)
-    
-#     def __str__(self):
-#         return f"{self.name} - {self.category}"
-    
-#     class Meta:
-#         ordering = ['name']
-
 
 
 class Ingredient(models.Model):
@@ -151,16 +135,6 @@ class OTPSession(models.Model):
         return timezone.now() > expiry_time
     
 
-
-
-
-
-
-
-
-
-
-
 # Add these new models to your existing models.py
 
 class SkinTypeRecommendation(models.Model):
@@ -231,48 +205,6 @@ class DermatologistSuggestion(models.Model):
     
     def __str__(self):
         return f"{self.ingredient.name} - {self.suggestion_type}"
-
-
-# class SkinAnalysisReport(models.Model):
-#     """Enhanced skincare analysis report with skin type recommendations"""
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     product_name = models.CharField(max_length=200)
-#     user_skin_type = models.CharField(max_length=20, choices=SkinTypeRecommendation.SKIN_TYPES, null=True, blank=True)
-#     ingredients_analyzed = models.JSONField(default=list)
-    
-#     # Overall scores
-#     overall_score = models.IntegerField(default=0, help_text="0-100 overall product score")
-#     skin_compatibility_score = models.IntegerField(default=0, help_text="0-100 compatibility with user's skin")
-#     safety_score = models.IntegerField(default=0)
-#     efficacy_score = models.IntegerField(default=0)
-    
-#     # Counts
-#     safe_count = models.IntegerField(default=0)
-#     moderate_count = models.IntegerField(default=0)
-#     harmful_count = models.IntegerField(default=0)
-#     scientifically_approved_count = models.IntegerField(default=0)
-#     dermatologist_recommended_count = models.IntegerField(default=0)
-    
-#     # Recommendations
-#     overall_verdict = models.CharField(max_length=50, choices=[
-#         ('excellent', 'Excellent Choice 🌟'),
-#         ('good', 'Good Choice ✅'),
-#         ('moderate', 'Use with Caution ⚠️'),
-#         ('avoid', 'Avoid ❌'),
-#     ], default='moderate')
-    
-#     recommendation_summary = models.TextField()
-#     skin_specific_advice = models.TextField(blank=True)
-#     alternatives_suggested = models.JSONField(default=list, blank=True)
-    
-#     analyzed_at = models.DateTimeField(auto_now_add=True)
-#     is_deleted_by_user = models.BooleanField(default=False)
-    
-#     class Meta:
-#         ordering = ['-analyzed_at']
-    
-#     def __str__(self):
-#         return f"{self.user.username} - {self.product_name} - Score: {self.overall_score}"
 
 
 class SkinAnalysisReport(models.Model):

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>AI Smart Care Analyzer - {% block title %}Intelligent Ingredient Analysis{% endblock %}</title>
     <style>
         * {
@@ -17,8 +17,6 @@
             min-height: 100vh;
             color: #2d3748;
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
 
         /* Luxury Glass Morphism Navbar */
         .navbar {
@@ -47,12 +45,12 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            font-size: 1.5rem;
+            font-size: clamp(1rem, 5vw, 1.5rem);
             font-weight: 700;
         }
 
         .logo p {
-            font-size: 0.7rem;
+            font-size: clamp(0.6rem, 3vw, 0.7rem);
             color: #718096;
             letter-spacing: 1px;
         }
@@ -70,7 +68,8 @@
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            cursor: pointer;
         }
 
         .nav-links a:hover {
@@ -98,6 +97,7 @@
             padding: 0.5rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
+            cursor: pointer;
         }
 
         .btn-logout:hover {
@@ -105,9 +105,14 @@
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        /* Dropdown Menu for Skincare */
+        /* Dropdown Menu - FIXED */
         .dropdown {
             position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            cursor: pointer;
             display: inline-block;
         }
 
@@ -116,9 +121,9 @@
             position: absolute;
             background: white;
             min-width: 220px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
             border-radius: 12px;
-            z-index: 1;
+            z-index: 1001;
             top: 100%;
             left: 0;
             margin-top: 10px;
@@ -130,6 +135,7 @@
             text-decoration: none;
             display: block;
             border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
         }
 
         .dropdown-content a:last-child {
@@ -141,12 +147,16 @@
             color: #667eea;
         }
 
-        .dropdown:hover .dropdown-content {
-            display: block;
+        /* Show dropdown on hover (desktop) */
+        @media (min-width: 769px) {
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
         }
-
-        .dropdown:hover .dropbtn {
-            color: #667eea;
+        
+        /* For mobile - show on click */
+        .dropdown.active .dropdown-content {
+            display: block;
         }
 
         /* Main Content */
@@ -199,11 +209,15 @@
         /* Footer */
         .footer {
             background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
+            padding: clamp(1rem, 4vw, 2rem);
             text-align: center;
             color: #718096;
             margin-top: 3rem;
             border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .footer p {
+            font-size: clamp(0.7rem, 3vw, 0.9rem);
         }
 
         /* Mobile Menu Button */
@@ -211,13 +225,18 @@
             display: none;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: #667eea;
+            padding: 5px 10px;
         }
 
-        /* Responsive */
+        /* Responsive Styles */
         @media (max-width: 768px) {
+            .nav-container {
+                position: relative;
+            }
+            
             .mobile-menu-btn {
                 display: block;
             }
@@ -228,6 +247,9 @@
                 flex-direction: column;
                 gap: 1rem;
                 padding: 1rem 0;
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 12px;
+                margin-top: 1rem;
             }
             
             .nav-links.show {
@@ -243,14 +265,47 @@
                 box-shadow: none;
                 margin-top: 5px;
                 background: #f8f9fa;
+                width: 100%;
+                display: none;
+            }
+            
+            .dropdown.active .dropdown-content {
+                display: block;
             }
             
             .main-content {
                 padding: 0 1rem;
+                margin: 1rem auto;
             }
             
-            .logo h2 {
-                font-size: 1.2rem;
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .nav-links a {
+                padding: 8px 0;
+                width: 100%;
+                display: block;
+            }
+            
+            .btn-logout {
+                text-align: center;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0.6rem 0.8rem;
+            }
+            
+            .main-content {
+                padding: 0 0.8rem;
+            }
+            
+            .alert {
+                padding: 0.8rem 1rem;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -268,12 +323,11 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
                     <a href="{% url 'search-product' %}">🛍️ Products</a>
+                    <a href="{% url 'profile' %}">👤 Profile</a>
                     
-                    <!-- AI Analyzer and Reports: hidden for admin (superuser) users -->
                     {% if not user.is_superuser %}
-                        <!-- Skincare Analyzer Dropdown -->
-                        <div class="dropdown">
-                            <a href="#" class="dropbtn">🔬 Skincare Analyzer ▼</a>
+                        <div class="dropdown" id="skincareDropdown">
+                            <a href="javascript:void(0)" class="dropbtn" onclick="toggleDropdown('skincareDropdown')">🔬 Skincare Analyzer ▼</a>
                             <div class="dropdown-content">
                                 <a href="{% url 'skincare-analyzer' %}">✨ Professional Analyzer</a>
                                 <a href="{% url 'skin-report-history' %}">📊 My Analysis Reports</a>
@@ -284,11 +338,9 @@
                         </div>
                     {% endif %}
                     
-                    <a href="{% url 'profile' %}">👤 Profile</a>
-                    
                     {% if user.is_superuser %}
-                        <div class="dropdown">
-                            <a href="#" class="dropbtn">⚙️ Admin Panel ▼</a>
+                        <div class="dropdown" id="adminDropdown">
+                            <a href="javascript:void(0)" class="dropbtn" onclick="toggleDropdown('adminDropdown')">⚙️ Admin Panel ▼</a>
                             <div class="dropdown-content">
                                 <a href="{% url 'admin-dashboard' %}">📊 Admin Dashboard</a>
                                 <a href="{% url 'manage-products' %}">📦 Manage Products</a>
@@ -326,19 +378,94 @@
     </footer>
 
     <script>
+        // Mobile menu toggle
         function toggleMobileMenu() {
             const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('show');
+            if (navLinks) {
+                navLinks.classList.toggle('show');
+            }
         }
+        
+        // Dropdown toggle for mobile (and desktop click)
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown) {
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    if (d.id !== dropdownId && d.classList.contains('active')) {
+                        d.classList.remove('active');
+                    }
+                });
+                dropdown.classList.toggle('active');
+            }
+        }
+        
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Don't close if clicking on dropdown toggle
+                if (this.getAttribute('onclick') && this.getAttribute('onclick').includes('toggleDropdown')) {
+                    return;
+                }
+                const navLinks = document.getElementById('navLinks');
+                if (window.innerWidth <= 768 && navLinks && navLinks.classList.contains('show')) {
+                    navLinks.classList.remove('show');
+                }
+                // Close dropdowns on link click (for mobile)
+                if (window.innerWidth <= 768) {
+                    document.querySelectorAll('.dropdown').forEach(d => {
+                        d.classList.remove('active');
+                    });
+                }
+            });
+        });
+        
+        // Close dropdowns when clicking outside (for mobile)
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                const isDropdown = event.target.closest('.dropdown');
+                if (!isDropdown) {
+                    document.querySelectorAll('.dropdown').forEach(d => {
+                        d.classList.remove('active');
+                    });
+                }
+            }
+        });
         
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
             const navLinks = document.getElementById('navLinks');
             const menuBtn = document.querySelector('.mobile-menu-btn');
-            if (!navLinks.contains(event.target) && !menuBtn.contains(event.target) && navLinks.classList.contains('show')) {
-                navLinks.classList.remove('show');
+            if (navLinks && menuBtn && window.innerWidth <= 768) {
+                if (!navLinks.contains(event.target) && !menuBtn.contains(event.target) && navLinks.classList.contains('show')) {
+                    navLinks.classList.remove('show');
+                }
             }
         });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const navLinks = document.getElementById('navLinks');
+            if (window.innerWidth > 768 && navLinks) {
+                navLinks.classList.remove('show');
+                // Close all dropdowns on resize to desktop
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    d.classList.remove('active');
+                });
+            }
+        });
+        
+        // Desktop hover functionality (keep working)
+        if (window.innerWidth > 768) {
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                dropdown.addEventListener('mouseenter', function() {
+                    // Don't interfere with click on mobile
+                });
+                dropdown.addEventListener('mouseleave', function() {
+                    // Don't interfere with click on mobile
+                });
+            });
+        }
     </script>
     
     {% block extra_js %}{% endblock %}

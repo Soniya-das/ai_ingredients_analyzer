@@ -2,45 +2,63 @@
 
 {% block content %}
 <style>
+    /* ===== FULLY RESPONSIVE REPORT PAGE ===== */
+    * {
+        box-sizing: border-box;
+    }
+    
     .report-container {
         max-width: 900px;
         margin: 0 auto;
         background: white;
-        border-radius: 30px;
-        padding: 2rem;
+        border-radius: clamp(20px, 5vw, 30px);
+        padding: clamp(1.5rem, 4vw, 2rem);
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
         position: relative;
     }
 
     .report-header {
         text-align: center;
-        padding-bottom: 2rem;
+        padding-bottom: clamp(1rem, 3vw, 2rem);
         border-bottom: 2px solid #e2e8f0;
-        margin-bottom: 2rem;
+        margin-bottom: clamp(1rem, 3vw, 2rem);
+    }
+    
+    .report-header h1 {
+        font-size: clamp(1.3rem, 5vw, 1.8rem);
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .report-header p {
+        font-size: clamp(0.8rem, 3vw, 0.95rem);
+        margin: 0.3rem 0;
     }
 
     .status-large {
-        font-size: 2rem;
-        padding: 1rem;
+        font-size: clamp(1.2rem, 4vw, 2rem);
+        padding: clamp(0.8rem, 3vw, 1rem);
         border-radius: 20px;
         display: inline-block;
         margin: 1rem 0;
+        font-weight: bold;
     }
 
     .status-safe { background: #c6f6d5; color: #22543d; }
     .status-moderate { background: #feebc8; color: #7b341e; }
     .status-harmful { background: #fed7d7; color: #742a2a; }
 
+    /* Stats Grid - Responsive */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        margin-bottom: 2rem;
+        gap: clamp(0.8rem, 2vw, 1rem);
+        margin-bottom: clamp(1.5rem, 4vw, 2rem);
     }
 
     .stat-box {
         background: #f7fafc;
-        padding: 1.5rem;
+        padding: clamp(1rem, 3vw, 1.5rem);
         border-radius: 20px;
         text-align: center;
         cursor: pointer;
@@ -53,88 +71,138 @@
     }
 
     .stat-value {
-        font-size: 2.5rem;
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
         font-weight: 800;
     }
+    
+    .stat-box div:not(.stat-value) {
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    }
 
+    .count-info {
+        font-size: clamp(0.65rem, 2vw, 0.8rem);
+        color: #718096;
+        margin-top: 0.5rem;
+    }
+
+    /* Recommendation */
     .recommendation {
         background: linear-gradient(135deg, #fef3c7, #fde68a);
         border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
+        padding: clamp(1.5rem, 4vw, 2rem);
+        margin-bottom: clamp(1.5rem, 4vw, 2rem);
+    }
+    
+    .recommendation h3 {
+        font-size: clamp(1.1rem, 4vw, 1.3rem);
+        margin-bottom: 0.5rem;
+    }
+    
+    .recommendation p {
+        font-size: clamp(0.85rem, 3vw, 1rem);
+        line-height: 1.5;
     }
 
+    /* Action Buttons */
     .btn-actions {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        gap: clamp(0.8rem, 3vw, 1rem);
+        margin-bottom: clamp(1.5rem, 4vw, 2rem);
+        flex-wrap: wrap;
     }
 
     .btn {
         flex: 1;
-        padding: 1rem;
+        padding: clamp(0.8rem, 3vw, 1rem);
         text-align: center;
         text-decoration: none;
         border-radius: 15px;
         font-weight: 600;
+        font-size: clamp(0.8rem, 3vw, 0.95rem);
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
 
     .btn-primary {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
     }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
 
     .btn-secondary {
         background: #e2e8f0;
         color: #4a5568;
     }
+    
+    .btn-secondary:hover {
+        background: #cbd5e0;
+        transform: translateY(-2px);
+    }
 
+    /* Ingredient Section */
     .ingredient-section {
-        margin-top: 2rem;
+        margin-top: clamp(1.5rem, 4vw, 2rem);
         border-top: 2px solid #e2e8f0;
-        padding-top: 2rem;
+        padding-top: clamp(1.5rem, 4vw, 2rem);
     }
 
     .ingredient-tabs {
         display: flex;
-        gap: 1rem;
+        gap: clamp(0.5rem, 2vw, 1rem);
         margin-bottom: 1.5rem;
+        flex-wrap: wrap;
     }
 
     .tab-btn {
         flex: 1;
-        padding: 0.75rem;
+        padding: clamp(0.6rem, 2.5vw, 0.75rem);
         background: #f7fafc;
         border: none;
         border-radius: 15px;
         cursor: pointer;
         font-weight: 600;
+        font-size: clamp(0.7rem, 2.5vw, 0.85rem);
         transition: all 0.3s ease;
+        min-width: 100px;
     }
 
     .tab-btn.active {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
     }
+    
+    .tab-btn:hover:not(.active) {
+        background: #e2e8f0;
+    }
 
     .ingredient-list {
         background: #f7fafc;
         border-radius: 20px;
-        padding: 1.5rem;
+        padding: clamp(1rem, 3vw, 1.5rem);
         max-height: 400px;
         overflow-y: auto;
     }
 
     .ingredient-item {
-        padding: 0.75rem;
+        padding: clamp(0.6rem, 2vw, 0.75rem);
         border-bottom: 1px solid #e2e8f0;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex-wrap: wrap;
     }
 
     .ingredient-item:last-child {
         border-bottom: none;
+    }
+    
+    .ingredient-item span {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        word-break: break-word;
     }
 
     .ingredient-badge {
@@ -142,6 +210,7 @@
         height: 10px;
         border-radius: 50%;
         display: inline-block;
+        flex-shrink: 0;
     }
 
     .badge-safe { background: #48bb78; }
@@ -150,33 +219,188 @@
 
     .empty-list {
         text-align: center;
-        padding: 2rem;
+        padding: clamp(1.5rem, 5vw, 2rem);
         color: #718096;
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
     }
 
-    .count-info {
-        font-size: 0.8rem;
-        color: #718096;
-        margin-top: 0.5rem;
-    }
-
-    h1 {
-        font-size: 1.8rem;
-        color: #2d3748;
-    }
-
-    @media (max-width: 768px) {
+    /* ========== RESPONSIVE BREAKPOINTS ========== */
+    
+    /* Tablet (768px to 1024px) */
+    @media (max-width: 1024px) {
         .report-container {
-            padding: 1.5rem;
+            max-width: 95%;
+            margin: 1rem auto;
         }
+    }
+    
+    /* Mobile (up to 768px) */
+    @media (max-width: 768px) {
         .stats-grid {
-            gap: 0.5rem;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
         }
+        
         .stat-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            padding: 0.8rem 1rem;
+        }
+        
+        .stat-box .stat-value {
+            order: 2;
+            font-size: 1.5rem;
+        }
+        
+        .stat-box div:not(.stat-value) {
+            order: 1;
+        }
+        
+        .count-info {
+            display: none;
+        }
+        
+        .ingredient-tabs {
+            flex-direction: column;
+        }
+        
+        .tab-btn {
+            width: 100%;
+        }
+        
+        .btn-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .ingredient-item {
+            flex-wrap: nowrap;
+        }
+    }
+    
+    /* Very Small Mobile (up to 480px) */
+    @media (max-width: 480px) {
+        .report-container {
+            padding: 1rem;
+            margin: 0.5rem;
+        }
+        
+        .report-header h1 {
+            font-size: 1.2rem;
+        }
+        
+        .status-large {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .stat-box {
+            padding: 0.6rem 0.8rem;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+        }
+        
+        .recommendation {
             padding: 1rem;
         }
+        
+        .ingredient-list {
+            padding: 0.8rem;
+        }
+        
+        .ingredient-item {
+            padding: 0.5rem;
+            gap: 0.3rem;
+        }
+        
+        .ingredient-item span {
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Small Mobile (up to 375px) */
+    @media (max-width: 375px) {
+        .stat-box {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .stat-box .stat-value {
+            order: 1;
+        }
+        
+        .stat-box div:not(.stat-value) {
+            order: 2;
+        }
+        
+        .ingredient-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .ingredient-badge {
+            width: 8px;
+            height: 8px;
+        }
+    }
+    
+    /* Desktop (1281px to 1920px) */
+    @media (min-width: 1281px) and (max-width: 1920px) {
+        .report-container {
+            max-width: 1000px;
+        }
+    }
+    
+    /* Large Desktop (1921px and above) */
+    @media (min-width: 1921px) {
+        .report-container {
+            max-width: 1200px;
+        }
+        
+        .report-header h1 {
+            font-size: 2.2rem;
+        }
+        
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 3rem;
+        }
+        
+        .tab-btn {
+            font-size: 1rem;
+            padding: 1rem;
+        }
+        
+        .ingredient-item span {
+            font-size: 1rem;
+        }
+    }
+    
+    /* Print Styles */
+    @media print {
+        .btn-actions, .tab-btn, .count-info {
+            display: none;
+        }
+        
+        .report-container {
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .status-large {
+            border: 1px solid #ddd;
+        }
+        
+        .ingredient-list {
+            max-height: none;
+            overflow-y: visible;
         }
     }
 </style>
@@ -277,10 +501,12 @@
 
 <script>
     function showIngredientTab(type) {
+        // Hide all lists
         document.getElementById('safe-list').style.display = 'none';
         document.getElementById('moderate-list').style.display = 'none';
         document.getElementById('harmful-list').style.display = 'none';
         
+        // Show selected list
         if (type === 'safe') {
             document.getElementById('safe-list').style.display = 'block';
         } else if (type === 'moderate') {
@@ -289,11 +515,13 @@
             document.getElementById('harmful-list').style.display = 'block';
         }
         
+        // Update active tab styling
         const tabs = document.querySelectorAll('.tab-btn');
         tabs.forEach(tab => {
             tab.classList.remove('active');
         });
         
+        // Find and activate the clicked tab
         let targetButton = null;
         for (let btn of tabs) {
             if (btn.textContent.includes(type === 'safe' ? 'Safe' : type === 'moderate' ? 'Moderate' : 'Harmful')) {
@@ -304,13 +532,17 @@
         if (targetButton) targetButton.classList.add('active');
     }
     
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
+        // Show safe ingredients by default if available, otherwise show first available
         {% if safe_ingredients %}
             showIngredientTab('safe');
         {% elif moderate_ingredients %}
             showIngredientTab('moderate');
-        {% else %}
+        {% elif harmful_ingredients %}
             showIngredientTab('harmful');
+        {% else %}
+            showIngredientTab('safe');
         {% endif %}
     });
 </script>

@@ -76,6 +76,10 @@ urlpatterns = [
     # ===== API =====
     path('api/ingredient-search/', views.ingredient_search_api, name='ingredient-search-api'),
     path('ingredient/<str:ingredient_name>/info/', views.ingredient_scientific_info, name='ingredient-scientific-info'),
+
+
+
+    path('admin-skin-delete-report-permanent/<int:report_id>/',  views.admin_skin_delete_report_permanent,  name='admin-skin-permanent-delete'),
 ]
 
 if settings.DEBUG:

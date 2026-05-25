@@ -20,11 +20,35 @@
         --info: #3498DB;
     }
 
+    /* Prevent horizontal scroll */
+    html,
+    body {
+        overflow-x: hidden;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Responsive images */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Better button touch size */
+    button,
+    .analyze-btn,
+    .edit-profile-btn {
+        min-height: 44px;
+        cursor: pointer;
+    }
+
     /* Premium Container */
     .premium-analyzer {
         max-width: 1400px;
         margin: 0 auto;
         padding: 40px 20px;
+        width: 100%;
     }
 
     /* Hero Section */
@@ -36,6 +60,7 @@
         position: relative;
         overflow: hidden;
         box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        width: 100%;
     }
 
     .analyzer-hero::before {
@@ -64,6 +89,7 @@
         color: transparent;
         margin-bottom: 16px;
         letter-spacing: -0.02em;
+        line-height: 1.2;
     }
 
     .hero-subtitle {
@@ -82,6 +108,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         border: 1px solid rgba(212,175,55,0.2);
         position: relative;
+        width: 100%;
     }
 
     .profile-header {
@@ -91,6 +118,8 @@
         margin-bottom: 20px;
         padding-bottom: 20px;
         border-bottom: 2px solid #F0F0F0;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .profile-title {
@@ -115,7 +144,9 @@
         font-size: 14px;
         transition: all 0.3s ease;
         border: none;
-        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
     .edit-profile-btn:hover {
@@ -164,6 +195,7 @@
         padding: 40px;
         box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         margin-bottom: 40px;
+        width: 100%;
     }
 
     .form-group {
@@ -191,6 +223,7 @@
         font-size: 16px;
         transition: all 0.3s ease;
         font-family: inherit;
+        background: white;
     }
 
     .form-input:focus, .form-textarea:focus, .form-select:focus {
@@ -253,7 +286,6 @@
         border-radius: 16px;
         font-size: 18px;
         font-weight: 700;
-        cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
@@ -323,6 +355,9 @@
 
     .loading-content {
         text-align: center;
+        padding: 20px;
+        width: 90%;
+        max-width: 400px;
     }
 
     .loading-spinner {
@@ -352,22 +387,290 @@
         margin-top: 10px;
     }
 
-    /* Responsive */
+    small {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    /* =========================================
+       TABLET RESPONSIVE (768px - 992px)
+    ========================================= */
+    @media (max-width: 992px) {
+        .hero-title {
+            font-size: 40px;
+        }
+
+        .analyzer-hero {
+            padding: 45px 35px;
+        }
+
+        .profile-info {
+            gap: 20px;
+        }
+        
+        .features-grid {
+            gap: 25px;
+        }
+    }
+
+    /* =========================================
+       MOBILE RESPONSIVE (up to 768px)
+    ========================================= */
     @media (max-width: 768px) {
         .premium-analyzer {
-            padding: 20px;
+            padding: 20px 15px;
         }
+
         .analyzer-hero {
-            padding: 40px 30px;
+            padding: 35px 25px;
+            border-radius: 24px;
+            text-align: center;
+            margin-bottom: 30px;
         }
+
+        .hero-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
         .hero-title {
-            font-size: 32px;
+            font-size: 30px;
+            line-height: 1.2;
         }
+
+        .hero-subtitle {
+            font-size: 15px;
+            max-width: 100%;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .edit-profile-btn {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .profile-info {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-item {
+            min-width: 100%;
+        }
+
         .analyzer-card {
             padding: 25px;
+            border-radius: 24px;
         }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            padding: 22px;
+        }
+
         .skin-type-selector {
             grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+        }
+
+        .loading-subtext {
+            font-size: 13px;
+            padding: 0 10px;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            padding: 14px 16px;
+            font-size: 16px;
+        }
+    }
+
+    /* =========================================
+       SMALL MOBILE (480px and below)
+    ========================================= */
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 26px;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+        }
+
+        .hero-icon {
+            font-size: 42px;
+        }
+        
+        .analyzer-hero {
+            padding: 30px 20px;
+        }
+
+        .skin-type-selector {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .skin-option {
+            padding: 12px;
+        }
+
+        .skin-emoji {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .skin-name {
+            font-size: 13px;
+        }
+
+        .feature-title {
+            font-size: 16px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .analyze-btn {
+            font-size: 16px;
+            padding: 16px;
+        }
+        
+        .profile-title {
+            font-size: 18px;
+        }
+        
+        .profile-title span {
+            font-size: 20px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+        }
+        
+        .form-label {
+            font-size: 13px;
+        }
+    }
+
+    /* =========================================
+       VERY SMALL MOBILE (360px and below)
+    ========================================= */
+    @media (max-width: 360px) {
+        .hero-title {
+            font-size: 22px;
+        }
+
+        .analyzer-hero {
+            padding: 25px 16px;
+        }
+        
+        .hero-icon {
+            font-size: 36px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+
+        .profile-title {
+            font-size: 16px;
+        }
+
+        .info-value {
+            font-size: 14px;
+        }
+        
+        .analyze-btn {
+            font-size: 15px;
+            padding: 14px;
+        }
+        
+        .feature-card {
+            padding: 18px;
+        }
+    }
+
+    /* =========================================
+       LARGE DESKTOP & FULLSCREEN (1600px+)
+    ========================================= */
+    @media (min-width: 1600px) {
+        .premium-analyzer {
+            max-width: 1600px;
+            padding: 50px 30px;
+        }
+
+        .hero-title {
+            font-size: 56px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            max-width: 700px;
+        }
+        
+        .analyzer-hero {
+            padding: 70px 60px;
+        }
+        
+        .features-grid {
+            gap: 35px;
+        }
+        
+        .feature-card {
+            padding: 35px;
+        }
+    }
+    
+    /* Ultra-wide screens (1920px+) */
+    @media (min-width: 1920px) {
+        .premium-analyzer {
+            max-width: 1800px;
+        }
+        
+        .hero-title {
+            font-size: 64px;
+        }
+        
+        .analyzer-hero {
+            padding: 80px 70px;
+        }
+    }
+
+    /* Touch-friendly improvements */
+    @media (hover: none) and (pointer: coarse) {
+        .skin-option:active {
+            transform: scale(0.98);
+        }
+        
+        .analyze-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .edit-profile-btn:active {
+            transform: scale(0.98);
         }
     }
 </style>

@@ -2,68 +2,382 @@
 
 {% block content %}
 <style>
+    /* ========== GLOBAL RESPONSIVE STYLES ========== */
+    * {
+        box-sizing: border-box;
+    }
+    
+    /* Header Section */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    h2 {
+        color: white;
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
+        margin: 0;
+    }
+    
+    /* Stats Card */
+    .stats-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        padding: clamp(0.8rem, 3vw, 1rem) clamp(1rem, 4vw, 2rem);
+        display: inline-block;
+        margin-bottom: 20px;
+        width: auto;
+    }
+    
+    .stats-card p {
+        color: white;
+        margin: 0;
+        font-size: clamp(0.9rem, 4vw, 1rem);
+    }
+    
+    .stats-card strong {
+        font-size: clamp(1.2rem, 5vw, 1.5rem);
+    }
+    
+    /* Table Container - Fully Responsive */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        background: white;
+    }
+    
     .users-table {
         width: 100%;
         background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-collapse: collapse;
+        min-width: 800px;
     }
+    
+    /* Desktop Table Styles */
     .users-table th {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
-        padding: 1rem;
+        padding: clamp(0.8rem, 3vw, 1rem);
         font-weight: 600;
+        font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+        text-align: left;
     }
+    
     .users-table td {
-        padding: 1rem;
+        padding: clamp(0.8rem, 3vw, 1rem);
         border-bottom: 1px solid #e2e8f0;
         vertical-align: middle;
+        font-size: clamp(0.75rem, 3vw, 0.85rem);
     }
-    .badge-admin { background: #ef4444; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-    .badge-user { background: #10b981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    
+    /* Row Hover Effect - Desktop Only */
+    @media (min-width: 769px) {
+        .users-table tr:hover {
+            background: #f7fafc;
+            transition: background 0.3s ease;
+        }
+    }
+    
+    /* Badge Styles */
+    .badge-admin {
+        background: #ef4444;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: clamp(10px, 3vw, 12px);
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    
+    .badge-user {
+        background: #10b981;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: clamp(10px, 3vw, 12px);
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    
+    /* Delete Button */
     .delete-user-btn {
         background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
         border: none;
-        padding: 6px 12px;
+        padding: clamp(5px, 2.5vw, 6px) clamp(10px, 4vw, 12px);
         border-radius: 8px;
         cursor: pointer;
-        font-size: 12px;
+        font-size: clamp(11px, 3.5vw, 12px);
         font-weight: 600;
-        transition: 0.2s;
+        transition: all 0.2s ease;
+        white-space: nowrap;
     }
-    .delete-user-btn:hover { background: #dc2626; transform: scale(1.02); }
-    .stats-card {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 20px;
-        padding: 1rem 2rem;
-        display: inline-block;
-        margin-bottom: 20px;
+    
+    .delete-user-btn:hover {
+        background: #dc2626;
+        transform: scale(1.02);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #718096;
+    }
+    
+    /* ========== RESPONSIVE BREAKPOINTS ========== */
+    
+    /* Tablet & Mobile Card View (up to 1024px) */
+    @media (max-width: 1024px) {
+        .users-table {
+            min-width: 600px;
+        }
+    }
+    
+    /* Mobile Card View (up to 768px) */
+    @media (max-width: 768px) {
+        .users-table,
+        .users-table thead,
+        .users-table tbody,
+        .users-table tr,
+        .users-table th,
+        .users-table td {
+            display: block;
+        }
+        
+        .users-table thead {
+            display: none;
+        }
+        
+        .users-table tr {
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            background: white;
+        }
+        
+        .users-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: right;
+        }
+        
+        .users-table td:last-child {
+            border-bottom: none;
+        }
+        
+        .users-table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            text-align: left;
+            flex: 1;
+            font-size: clamp(11px, 3.5vw, 12px);
+            color: #4a5568;
+            padding-right: 15px;
+        }
+        
+        .stats-card {
+            width: 100%;
+            text-align: center;
+        }
+    }
+    
+    /* Very Small Mobile (up to 480px) */
+    @media (max-width: 480px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .users-table td {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+        
+        .users-table td::before {
+            margin-bottom: 5px;
+            width: 100%;
+        }
+        
+        .delete-user-btn {
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .badge-admin, .badge-user {
+            display: inline-block;
+            margin-left: 8px;
+        }
+    }
+    
+    /* Small Mobile (up to 375px) */
+    @media (max-width: 375px) {
+        .users-table tr {
+            padding: 8px;
+        }
+        
+        .users-table td {
+            padding: 8px 6px;
+        }
+        
+        .users-table td::before {
+            font-size: 10px;
+        }
+        
+        .delete-user-btn {
+            font-size: 10px;
+            padding: 6px 10px;
+        }
+    }
+    
+    /* Tablet Landscape (769px to 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .users-table {
+            min-width: 700px;
+        }
+        
+        .users-table th,
+        .users-table td {
+            padding: 0.8rem;
+        }
+        
+        .table-container {
+            margin: 0 10px;
+        }
+    }
+    
+    /* Small Desktop (1025px to 1280px) */
+    @media (min-width: 1025px) and (max-width: 1280px) {
+        .table-container {
+            max-width: 95%;
+            margin: 0 auto;
+        }
+    }
+    
+    /* Desktop (1281px to 1920px) */
+    @media (min-width: 1281px) and (max-width: 1920px) {
+        .table-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+        }
+    }
+    
+    /* Large Desktop (1921px and above) */
+    @media (min-width: 1921px) {
+        .table-container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .users-table th,
+        .users-table td {
+            padding: 1.2rem;
+            font-size: 1rem;
+        }
+        
+        .users-table th {
+            font-size: 1rem;
+        }
+        
+        .delete-user-btn {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+        
+        .badge-admin, .badge-user {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+        }
+    }
+    
+    /* Print Styles */
+    @media print {
+        .delete-user-btn {
+            display: none;
+        }
+        
+        .stats-card {
+            background: #667eea;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+        
+        .users-table {
+            border: 1px solid #ddd;
+        }
+        
+        .users-table th {
+            background: #667eea;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
     }
 </style>
 
-<h2 style="color: white;">📋 Registered Users</h2>
-<div class="stats-card"><p style="color:white;">Total Users: <strong>{{ user_data|length }}</strong></p></div>
+<div class="page-header">
+    <h2>📋 Registered Users</h2>
+</div>
 
-<div style="overflow-x: auto;">
+<div class="stats-card">
+    <p>👥 Total Users: <strong>{{ user_data|length }}</strong></p>
+</div>
+
+<div class="table-container">
     <table class="users-table">
         <thead>
-            <tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Joined</th><th>Last Login</th><th>Role</th><th>Action</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Last Login</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
             {% for data in user_data %}
             <tr id="user-row-{{ data.user.id }}">
-                <td>{{ data.user.id }}</td>
-                <td>{{ data.user.username }}{% if data.user.is_superuser %} <span class="badge-admin">Admin</span>{% endif %}</td>
-                <td>{{ data.user.email }}</td>
-                <td>{{ data.profile.phone|default:"—" }}</td>
-                <td>{{ data.user.date_joined|date:"Y-m-d H:i" }}</td>
-                <td>{{ data.user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
-                <td>{% if data.user.is_superuser %}<span class="badge-admin">Admin</span>{% else %}<span class="badge-user">User</span>{% endif %}</td>
-                <td>
+                <td data-label="ID">{{ data.user.id }}</td>
+                <td data-label="Username">
+                    {{ data.user.username }}
+                    {% if data.user.is_superuser %}
+                        <span class="badge-admin">Admin</span>
+                    {% endif %}
+                </td>
+                <td data-label="Email">{{ data.user.email }}</td>
+                <td data-label="Phone">{{ data.profile.phone|default:"—" }}</td>
+                <td data-label="Joined">{{ data.user.date_joined|date:"Y-m-d H:i" }}</td>
+                <td data-label="Last Login">{{ data.user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+                <td data-label="Role">
+                    {% if data.user.is_superuser %}
+                        <span class="badge-admin">Admin</span>
+                    {% else %}
+                        <span class="badge-user">User</span>
+                    {% endif %}
+                </td>
+                <td data-label="Action">
                     {% if not data.user.is_superuser %}
-                    <!-- Form with manual JavaScript submission -->
                     <form method="post" action="{% url 'admin-delete-user' data.user.id %}" id="delete-form-{{ data.user.id }}" style="display:inline;">
                         {% csrf_token %}
                         <button type="button" class="delete-user-btn" onclick="confirmDelete({{ data.user.id }}, '{{ data.user.username|escapejs }}')">
@@ -71,12 +385,16 @@
                         </button>
                     </form>
                     {% else %}
-                    —
+                    <span style="color: #94a3b8;">—</span>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="8">No users registered.</td></tr>
+            <tr>
+                <td colspan="8" class="empty-state">
+                    📭 No users registered yet.
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -88,5 +406,10 @@
             document.getElementById(`delete-form-${userId}`).submit();
         }
     }
+    
+    // Optional: Add responsive handling for dynamic content
+    document.addEventListener('DOMContentLoaded', function() {
+        // Any initialization if needed
+    });
 </script>
 {% endblock %}

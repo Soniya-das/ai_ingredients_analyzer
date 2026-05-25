@@ -1,13 +1,33 @@
-# Environment
-env/
+﻿# Environment variables (contains passwords, emails)
 .env
+.env.local
+.env.production
 
 # Python cache
 __pycache__/
 *.pyc
 
+# Log files
+*.log
+logs/
+
+# Sensitive configs
+config.py
+secrets.json
+keys.py
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+
 # Database
+*.sqlite3
 db.sqlite3
 
-# Media
+# Media files
 media/
